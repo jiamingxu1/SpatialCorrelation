@@ -5,7 +5,7 @@
 clear; close all; clc; rng('shuffle');
 
 %% Enter participant number & specify display
-display = 2; % 1:testing room; 2:my laptop
+display = 1; % 1:testing room; 2:my laptop
 % ExpInfo = setup_exp(dislay);
 
 ExpInfo.subjID = [];
@@ -29,7 +29,7 @@ kb.escKey = KbName('ESCAPE');
 PsychDefaultSetup(2);
 InitializePsychSound
 devices = PsychPortAudio('GetDevices');
-device = devices(2).DeviceIndex; % my laptop
+device = devices(end).DeviceIndex; % my laptop
 
 kb.keyIsDown = 0; % set escape key
 kb.keyCode = zeros(1,256);
@@ -95,4 +95,5 @@ Screen('CloseAll');
 UniAlocalization_data = {ExpInfo,ScreenInfo}; % result in ExpInfo
 save(out1FileName,'UniAlocalization_data');
 Screen('CloseAll');
+ShowCursor;
 

@@ -10,11 +10,6 @@ switch display
         [ScreenInfo.xaxis, ScreenInfo.yaxis] = Screen('WindowSize',ScreenInfo.windowPtr);
        
 end
-        ScreenInfo.xmid = 450;
-        ScreenInfo.yaxis = 500;
-        ScreenInfo.liftingYaxis = 300;
-        ScreenInfo.numPixels_perCM = 7.5;
-        
         Screen('Preference', 'VisualDebugLevel', 1);
         Screen('Preference', 'SkipSyncTests', 1);
         
