@@ -42,7 +42,7 @@ while ~kb.keyCode(kb.escKey) || iT <= ExpInfo.nTrial
     currentAud = ExpInfo.design(iT);
     ExpInfo.result(iT,1) = ExpInfo.actualAud(currentAud);
     freq = freqMat(:,1);
-    wavedata = yMat{ExpInfo.fileOrder(currentAud),1};
+    wavedata = yMat{currentAud,1};
     
     % show fixation
     Screen('FillRect', ScreenInfo.windowPtr,[255 255 255], [ScreenInfo.x1_lb,ScreenInfo.y1_lb,...

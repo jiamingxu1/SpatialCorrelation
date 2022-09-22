@@ -1,15 +1,20 @@
 function ExpInfo = setup_param(display)
 
+%ExpInfo.fileDir = fullfile(pwd, '../AuditoryRecording/Pilot/JX');
+
 switch display
     case 1 % meyer 957 
         ExpInfo.nRep = 20;
-        ExpInfo.fileOrder = [10:-1:1,11:20];
-        ExpInfo.fileDir = '/Users/oliviaxujiaming/Desktop/NYU_research/Project_2/Experiment code/Auditory recording/Pilot/JX';
-
+        ExpInfo.fileOrder = 1:21;
     case 2 % my laptop
         ExpInfo.nRep = 1;
-        ExpInfo.fileOrder = (1:21);
-        ExpInfo.fileDir = '/Users/oliviaxujiaming/Desktop/NYU_research/Project_2/Experiment code/Auditory recording/Pilot/JX/*.wav';
+        %ExpInfo.fileOrder = (1:21);        
+        %fileList = (dir(ExpInfo.fileDir));
+        fileName = cell(21,1);
+        for iF = 1:21
+            fileName(iF,1) = dir([fullfile(pwd, '../AuditoryRecording/Pilot/JX/'),num2str(iF),'_*'])
+            
+        end
 end
     ExpInfo.sittingDistance = 105;
     
