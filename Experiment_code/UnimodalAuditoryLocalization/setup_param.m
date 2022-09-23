@@ -1,7 +1,7 @@
 function ExpInfo = setup_param(display)
 
 
-ExpInfo.nRep = 1;
+ExpInfo.nRep = 20;
 
         
 ExpInfo.fileName = cell(21,1);
