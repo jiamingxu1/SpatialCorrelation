@@ -2,8 +2,8 @@
 clear all; close all; clc; rng(1);
 
 %% load and organize data
-subjN    = 99;
-subjI    = 'JX';
+subjN    = 2;
+subjI    = 'ZL';
 addpath(['/Users/oliviaxujiaming/Desktop/GitHub/SpatialCorrelation/Experiment_code/UnimodalAuditoryLocalization/Pilot/',subjI]);
 C               = load(['UniAlocalization_sub', num2str(subjN), '.mat']);
 nRep            = C.UniAlocalization_data{1}.nRep;
@@ -17,17 +17,15 @@ meanLocResp_A   = NaN(1, nAudFile);
 close all
 figure
 hold on
-mXY = zeros(nAudFile,1);
+muLocResp = zeros(nAudFile,1);
 for ii = 1:nAudFile
-    
-   scatter(loc(ii),data(abs(data(:,1)-loc(ii))<1e-3,2),40,'filled')    
-   mXY(ii) = mean(data(abs(data(:,1)-loc(ii))<1e-3,2));
-  
+   scatter(loc(ii),data(abs(data(:,1)-loc(ii))<1e-3,2),20,'filled')    
+   muLocResp(ii) = mean(data(abs(data(:,1)-loc(ii))<1e-3,2));
 end
-plot(loc,mXY,'Linewidth',5)
-
-xlim([min(data(:,2)) max(data(:,2))])
-ylim([min(data(:,2)) max(data(:,2))])
-
-
-
+plot(loc,muLocResp,'Linewidth',3)
+set(gca,'XTick',-18:1.8:18)
+xlim([-20 20])
+ylim([min(data(:,2))-3 max(data(:,2))+3])
+xlabel('Actual auditory locations (dvg)')
+ylabel('Localization responses (dvg)')
+title('Sub2 ZL')
