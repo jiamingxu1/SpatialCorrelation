@@ -60,6 +60,7 @@ while ~kb.keyCode(kb.escKey) || iT <= ExpInfo.nTrial
 % get mouse location
 
 yLoc = ScreenInfo.yaxis-ScreenInfo.liftingYaxis;
+WaitSecs(0.5)
 SetMouse(randi(ScreenInfo.xmid*2,1), yLoc, ScreenInfo.windowPtr); buttons = 0;
 
 while sum(buttons)==0

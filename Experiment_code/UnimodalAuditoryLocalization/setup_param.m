@@ -1,12 +1,12 @@
 function ExpInfo = setup_param(display)
 
 
-ExpInfo.nRep = 20;
+ExpInfo.nRep = 3;
 
         
 ExpInfo.fileName = cell(21,1);
         for iF = 1:21
-            tmpPath =  dir([fullfile(pwd, '../AuditoryRecording/Pilot/ZL/'),num2str(iF),'_*']);
+            tmpPath =  dir([fullfile(pwd, '../AuditoryRecording/Pilot/ML/'),num2str(iF),'_*']);
             ExpInfo.fileName{iF,1} = [tmpPath.folder '/' tmpPath.name];
         end
         

@@ -1,14 +1,16 @@
+
 %% Present sound stimuli (testing) 
 
 % This script presents (single) auditory stimuli in all possible locations for the
 % purpose of recording spatial sound (testing)
 clear all; close all; clc; rng('shuffle');
+addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 
-%% Screen Setup 
+%% Screen Setup sca
 Screen('Preference', 'VisualDebugLevel', 1);
 Screen('Preference', 'SkipSyncTests', 1);
-%[windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5]);
-[windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5],[100 100 1000 600]); % for testing
+% [windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5]);
+ [windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5],[100 100 1000 600]); % for testing
 [ScreenInfo.xaxis, ScreenInfo.yaxis] = Screen('WindowSize',windowPtr);
 Screen('TextSize', windowPtr, 35) ;   
 Screen('TextFont',windowPtr,'Times');
@@ -31,7 +33,7 @@ ScreenInfo.y2_ub = ScreenInfo.yaxis-ScreenInfo.liftingYaxis+7;
 
 
 %% Open the motorArduino
-motorArduino            = serial('/dev/cu.usbmodemFA1341'); 
+motorArduino            = serial('/dev/cu.usbmodemFA1331'); 
 motorArduino.Baudrate   = 9600;
 motorArduino.StopBits   = 1;
 motorArduino.Terminator = 'LF';
@@ -47,7 +49,7 @@ PsychDefaultSetup(2);
 InitializePsychSound
 devices = PsychPortAudio('GetDevices');
 % our_device=devices(3).DeviceIndex;
-our_device=devices(1).DeviceIndex; % for testing
+our_device=devices(3).DeviceIndex; % for testing
 
 %% create auditory stimuli
 %white noise for mask noise
