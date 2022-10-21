@@ -3,11 +3,12 @@
 % This script presents (single) auditory stimuli in all possible locations for the
 % purpose of recording spatial sound (testing)
 clear all; close all; clc; rng('shuffle');
+addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 
 %% Screen Setup 
 Screen('Preference', 'VisualDebugLevel', 1);
 Screen('Preference', 'SkipSyncTests', 1);
-%[windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5]);
+% [windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5]);
 [windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5],[100 100 1000 600]); % for testing
 [ScreenInfo.xaxis, ScreenInfo.yaxis] = Screen('WindowSize',windowPtr);
 Screen('TextSize', windowPtr, 35) ;   
@@ -31,11 +32,13 @@ ScreenInfo.y2_ub = ScreenInfo.yaxis-ScreenInfo.liftingYaxis+7;
 
 
 %% Open the motorArduino
-motorArduino            = serial('/dev/cu.usbmodemFA1341'); 
+% motorArduino            = serial('/dev/cu.usbmodemFA1341'); 
+ motorArduino            = serial('/dev/cu.usbmodemFA1331');
+%motorArduino            = serial('/dev/cu.usbmodemFD1331');
 motorArduino.Baudrate   = 9600;
 motorArduino.StopBits   = 1;
 motorArduino.Terminator = 'LF';
-motorArduino.Parity     = 'none';
+motorArduino.Parity     = 'none'; 
 motorArduino.FlowControl= 'none';
 fopen(motorArduino);
 pause(2);
@@ -46,9 +49,7 @@ PsychDefaultSetup(2);
 % get correct sound card
 InitializePsychSound
 devices = PsychPortAudio('GetDevices');
-% our_device=devices(3).DeviceIndex;
-our_device=devices(1).DeviceIndex; % for testing
-
+our_device=devices(3).DeviceIndex;
 %% create auditory stimuli
 %white noise for mask noise
 AudInfo.fs              = 44100;
@@ -74,7 +75,7 @@ AudInfo.waitTime        = 2;
 AudInfo.InitialLoc      = -7.5;
 AudInfo.locs            = linspace(-18,18,21);
 AudInfo.numLocs         = length(AudInfo.locs); 
-AudInfo.numTrialsPerLoc = 2; %2 for practice, 20 for the real experiment
+AudInfo.numTrialsPerLoc = 1; %2 for practice, 20 for the real experiment
 AudInfo.numTotalTrials  = AudInfo.numTrialsPerLoc * AudInfo.numLocs;
 
 %create a matrix whose 1st column is initial position and 2nd column is final position

@@ -1,4 +1,3 @@
-
 %% Present sound stimuli (testing) 
 
 % This script presents (single) auditory stimuli in all possible locations for the
@@ -6,11 +5,11 @@
 clear all; close all; clc; rng('shuffle');
 addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 
-%% Screen Setup sca
+%% Screen Setup 
 Screen('Preference', 'VisualDebugLevel', 1);
 Screen('Preference', 'SkipSyncTests', 1);
-% [windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5]);
- [windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5],[100 100 1000 600]); % for testing
+[windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5]);
+%[windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5],[100 100 1000 600]); % for testing
 [ScreenInfo.xaxis, ScreenInfo.yaxis] = Screen('WindowSize',windowPtr);
 Screen('TextSize', windowPtr, 35) ;   
 Screen('TextFont',windowPtr,'Times');
@@ -33,11 +32,13 @@ ScreenInfo.y2_ub = ScreenInfo.yaxis-ScreenInfo.liftingYaxis+7;
 
 
 %% Open the motorArduino
-motorArduino            = serial('/dev/cu.usbmodemFA1331'); 
+% motorArduino            = serial('/dev/cu.usbmodemFA1341'); 
+ motorArduino            = serial('/dev/cu.usbmodemFA1331');
+%motorArduino            = serial('/dev/cu.usbmodemFD1331');
 motorArduino.Baudrate   = 9600;
 motorArduino.StopBits   = 1;
 motorArduino.Terminator = 'LF';
-motorArduino.Parity     = 'none';
+motorArduino.Parity     = 'none'; 
 motorArduino.FlowControl= 'none';
 fopen(motorArduino);
 pause(2);
@@ -48,27 +49,11 @@ PsychDefaultSetup(2);
 % get correct sound card
 InitializePsychSound
 devices = PsychPortAudio('GetDevices');
-% our_device=devices(3).DeviceIndex;
-our_device=devices(3).DeviceIndex; % for testing
-
+our_device=devices(3).DeviceIndex;
 %% create auditory stimuli
 %white noise for mask noise
 AudInfo.fs              = 44100;
 audioSamples            = linspace(1,AudInfo.fs,AudInfo.fs);
-maskNoiseDuration       = 2; %the duration of the mask sound depends the total steps
-MotorNoiseRepeated      = MakeMaskingSound(AudInfo.fs*maskNoiseDuration);
-
-% set sound duration for both sound stimulus and mask noise
-duration_mask           = length(audioSamples)*maskNoiseDuration;
-timeline_mask           = linspace(1,duration_mask,duration_mask);
-
-%generate white noise (one audio output channel)
-carrierSound_mask       = randn(1, max(timeline_mask)); 
-%create adaptation sound (only one loudspeaker will play the white noise)
-AudInfo.intensity_MNR   = 100; %how loud do we want the recorded motor noise be
-AudInfo.MaskNoise       = [carrierSound_mask+AudInfo.intensity_MNR.*MotorNoiseRepeated;
-                            zeros(size(carrierSound_mask))]; 
-%windowed: sineWindow_mask.*carrierSound_mask %non-windowed: carrierSound_mask
 
 %for gaussion white noise
 standardFrequency_gwn       = 10;
@@ -86,75 +71,69 @@ pahandle                    = PsychPortAudio('Open', our_device, [], [], [], 2);
 
 %% Specify the locations of the auditory stimulus (make changes here)
 % store the differences between standard and test four locations
-AudInfo.waitTime        = 0.5; 
+AudInfo.waitTime        = 2; 
 AudInfo.InitialLoc      = -7.5;
 AudInfo.locs            = linspace(-18,18,21);
 AudInfo.numLocs         = length(AudInfo.locs); 
-AudInfo.numTrialsPerLoc = 2; %2 for practice, 20 for the real experiment
+AudInfo.numTrialsPerLoc = 1; %2 for practice, 20 for the real experiment
 AudInfo.numTotalTrials  = AudInfo.numTrialsPerLoc * AudInfo.numLocs;
 
 %create a matrix whose 1st column is initial position and 2nd column is final position
 AudInfo.Location_Matrix = [[AudInfo.InitialLoc, AudInfo.locs(1:end-1)]',...
                                  AudInfo.locs'];
+sittingDistance  = 105; %FH: need to define this before using it in line 100
 initialPosition  = AudInfo.Location_Matrix(:,1);
 finalPosition    = AudInfo.Location_Matrix(:,2);   
-getDist          = @(deg) tan(deg2rad(deg))*ExpInfo.sittingDistance; %distance in (cm) between the speaker location and the central fixation
-locations        = zeros(length(initialPosition),2);
+getDist          = @(deg) tan(deg2rad(deg))*sittingDistance; %distance in (cm) between the speaker location and the central fixation
 movingSteps      = zeros(length(initialPosition),1);
 
 for i = 1:length(initialPosition)
-    locations(i,:) = [initialPosition(i) finalPosition(i)]; %in deg
-    movingSteps(i,:) = (getDist(locations(i,2))-getDist(locations(i,1)))/3; %in steps
+    movingSteps(i) = (getDist(finalPosition(i))-getDist(initialPosition(i)))/3; %in steps
 end
-    
 
 %% Present auditory stimuli 
+for i = 1:length(initialPosition)
+    % Move the speaker to the location we want
+    movingSteps_i = movingSteps(i); 
+    waitTime1     = FindWaitTime(movingSteps_i);
 
-% Move the motor to the correct location  
-% Display Mask Noise
-PsychPortAudio('FillBuffer', pahandle, AudInfo.MaskNoise);
-PsychPortAudio('Start', pahandle, 0, 0, 1);
-
-% Move the speaker to the location we want
-movingSteps = movingSteps(trialNum); 
-waitTime1   = FindWaitTime(movingSteps);
-for s = 1:length(movingSteps)
-    if movingSteps(s) < 0  %when AuditoryLoc is negative, move to the left
-        fprintf(motorArduino,['%c','%d'], ['p', numRailSteps*abs(movingSteps(s))]);
+    if movingSteps_i < 0  %when AuditoryLoc is negative, move to the left
+        fprintf(motorArduino,['%c','%d'], ['p', noOfSteps*abs(movingSteps_i)]);
     else
-        fprintf(motorArduino,['%c','%d'], ['n', numRailSteps*movingSteps(s)]);
+        fprintf(motorArduino,['%c','%d'], ['n', noOfSteps*movingSteps_i]);
     end
     %wait shortly
-    WaitSecs(waitTime1(s));
+    WaitSecs(waitTime1);
+    %wait shortly
+    WaitSecs(AudInfo.waitTime);
+
+    % Display auditory stimuli
+    % Show fixation cross for 1 s and then a blank screen for 2 s
+    Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x1_lb,ScreenInfo.y1_lb,...
+        ScreenInfo.x1_ub, ScreenInfo.y1_ub]);
+    Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x2_lb,ScreenInfo.y2_lb,...
+        ScreenInfo.x2_ub, ScreenInfo.y2_ub]);
+    Screen('Flip',windowPtr); WaitSecs(0.5);
+    Screen('Flip',windowPtr); WaitSecs(0.5); 
+
+    for j = 1:AudInfo.numTrialsPerLoc
+        PsychPortAudio('FillBuffer', pahandle, AudInfo.GaussianWhiteNoise);
+        PsychPortAudio('Start', pahandle, 1, 0, 0);
+        WaitSecs(AudInfo.adaptationDuration);
+        PsychPortAudio('Stop', pahandle);
+
+        % Black screen for 0.5 seconds
+        Screen('Flip',windowPtr);
+        WaitSecs(2);
+    end
 end
-%wait shortly
-WaitSecs(AudInfo.waitTime);
-PsychPortAudio('Stop', pahandle);
-
-% Display auditory stimuli
-% Show fixation cross for 1 s and then a blank screen for 2 s
-Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x1_lb,ScreenInfo.y1_lb,...
-    ScreenInfo.x1_ub, ScreenInfo.y1_ub]);
-Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x2_lb,ScreenInfo.y2_lb,...
-    ScreenInfo.x2_ub, ScreenInfo.y2_ub]);
-Screen('Flip',windowPtr); WaitSecs(0.5);
-Screen('Flip',windowPtr); WaitSecs(0.5); 
-
-PsychPortAudio('FillBuffer', pahandle, AudInfo.GaussianWhiteNoise);
-PsychPortAudio('Start', pahandle, 1, 0, 0);
-WaitSecs(AudInfo.adaptationDuration);
-PsychPortAudio('Stop', pahandle);
-
-% Black screen for 0.5 seconds
-Screen('Flip',windowPtr);
-WaitSecs(0.5);
 
 
 %% Move the arduino to the leftmost place
 if abs(AudInfo.InitialLoc - AudInfo.Location_Matrix(end))>=0.01
     steps_goingBack = round((tan(deg2rad(AudInfo.InitialLoc))-...
                       tan(deg2rad(AudInfo.Location_Matrix(end))))*...
-                      ExpInfo.sittingDistance/3,2);
+                      sittingDistance/3,2);
     if steps_goingBack < 0 
         fprintf(motorArduino,['%c','%d'], ['p',noOfSteps*abs(steps_goingBack)]);
     else
