@@ -2,6 +2,7 @@ function  ScreenInfo = setup_screen(display)
 
 switch display
     case 1 % testing room
+        Screen('Preference', 'SkipSyncTests', 1);
         [ScreenInfo.windowPtr,rect] = Screen('OpenWindow', 0, [5,5,5]);
         [ScreenInfo.xaxis, ScreenInfo.yaxis] = Screen('WindowSize',ScreenInfo.windowPtr);
     
@@ -11,7 +12,7 @@ switch display
        
 end
         Screen('Preference', 'VisualDebugLevel', 1);
-        Screen('Preference', 'SkipSyncTests', 1);
+%         Screen('Preference', 'SkipSyncTests', 1);
         
         Screen('TextSize', ScreenInfo.windowPtr, 35) ;   
         Screen('TextFont',ScreenInfo.windowPtr,'Times');
