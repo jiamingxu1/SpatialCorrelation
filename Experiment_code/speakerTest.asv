@@ -1,8 +1,8 @@
 % Test speaker setup, display trains of auditory stimuli
 
-%% Setup variables
-
-display = 2; % 1:testing room; 2:my laptop
+%% Enter subject's name
+clear all; close all; clc; rng('shuffle');
+addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 
 ExpInfo.subjID = [];
 while isempty(ExpInfo.subjID) == 1
@@ -11,34 +11,43 @@ while isempty(ExpInfo.subjID) == 1
     end
 end
 
-ExpInfo = setup_param(display); 
-ScreenInfo = setup_screen(display);
-kb.escKey = KbName('ESCAPE');
+%% Screen Setup 
+Screen('Preference', 'VisualDebugLevel', 1);
+Screen('Preference', 'SkipSyncTests', 1);
+[windowPtr,rect] = Screen('OpenWindow', 0, [1,1,1]);
+%[windowPtr,rect] = Screen('OpenWindow', 0, [0,0,0],[100 100 1000 480]); % for testing
+[ScreenInfo.xaxis, ScreenInfo.yaxis] = Screen('WindowSize',windowPtr);
+Screen('TextSize', windowPtr, 35) ;   
+Screen('TextFont',windowPtr,'Times');
+Screen('TextStyle',windowPtr,1); 
 
-%% Open the Arduino
-Arduino            = serial('/dev/cu.usbmodemFA1341'); 
-Arduino.Baudrate   = 9600;
-Arduino.StopBits   = 1;
-Arduino.Terminator = 'LF';
-Arduino.Parity     = 'none';
-Arduino.FlowControl= 'none';
-fopen(Arduino);
-pause(2);
-noOfSteps = 3200;  
+[center(1), center(2)]     = RectCenter(rect);
+ScreenInfo.xmid            = center(1); % horizontal center
+ScreenInfo.ymid            = center(2); % vertical center
+ScreenInfo.backgroundColor = 105;
+ScreenInfo.numPixels_perCM = 7.5;
+ScreenInfo.liftingYaxis    = 300; 
 
-%% Open speakers and create sound stimuli 
+%fixation locations
+ScreenInfo.x1_lb = ScreenInfo.xmid-7; ScreenInfo.x2_lb = ScreenInfo.xmid-1;
+ScreenInfo.x1_ub = ScreenInfo.xmid+7; ScreenInfo.x2_ub = ScreenInfo.xmid+1;
+ScreenInfo.y1_lb = ScreenInfo.yaxis-ScreenInfo.liftingYaxis-1;
+ScreenInfo.y1_ub = ScreenInfo.yaxis-ScreenInfo.liftingYaxis+1;
+ScreenInfo.y2_lb = ScreenInfo.yaxis-ScreenInfo.liftingYaxis-7;
+ScreenInfo.y2_ub = ScreenInfo.yaxis-ScreenInfo.liftingYaxis+7;
 
-addpath(genpath(PsychtoolboxRoot))
-PsychDefaultSetup(2);
-% get correct sound card
-InitializePsychSound
-devices = PsychPortAudio('GetDevices');
-our_device=devices(3).DeviceIndex; % ????
-
-%% Create auditory stimuli
-
-GWN = makeWhiteNoise(display);
-pahandle                    = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
+%% make auditory stimuli (gaussian white noise)
+AudInfo.fs                  = 44100;
+audioSamples                = linspace(1,AudInfo.fs,AudInfo.fs);
+standardFrequency_gwn       = 10;
+AudInfo.adaptationDuration  = 0.1; %0.05 %the burst of sound will be displayed for 40 milliseconds
+duration_gwn                = length(audioSamples)*AudInfo.adaptationDuration;
+timeline_gwn                = linspace(1,duration_gwn,duration_gwn);
+sineWindow_gwn              = sin(standardFrequency_gwn/2*2*pi*timeline_gwn/AudInfo.fs); 
+carrierSound_gwn            = randn(1, max(timeline_gwn));
+AudInfo.intensity_GWN       = 15;
+AudInfo.GaussianWhiteNoise  = [zeros(size(carrierSound_gwn));...
+                                 AudInfo.intensity_GWN.*sineWindow_gwn.*carrierSound_gwn]; 
 
 %% Create auditory/visual train
 
@@ -50,11 +59,29 @@ AudInfo.nTrials       = 10; % for testing
 
 % shuffle auditory locations
 audTrain = NaN(AudInfo.nTrials, AudInfo.nEvents);
-allSeqs = perms(1:nEvents);
+allSeqs = perms(1:AudInfo.nEvents);
 for i = 1:AudInfo.nTrials
     audTrain(i,:) = allSeqs(i,:)+...
         AudInfo.iniTrainLoc(randi(numel(AudInfo.iniTrainLoc)));
 end
+
+
+                             
+                             %% Open speakers and create sound stimuli 
+
+addpath(genpath(PsychtoolboxRoot))
+PsychDefaultSetup(2);
+% get correct sound card
+InitializePsychSound
+devices = PsychPortAudio('GetDevices');
+our_device=devices(3).DeviceIndex;
+pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
+     
+%% initialise serial object
+allSerialDev = serialportlist("all");
+Arduino = serial('COM5'); 
+% open for usage
+fopen(Arduino);
 
 %% Play bimodal aud vis trains
 
