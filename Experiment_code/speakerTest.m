@@ -67,7 +67,7 @@ end
                              
 %% Open speakers and create sound stimuli 
 
-addpath(genpath(PsychtoolboxRoot))
+addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 PsychDefaultSetup(2);
 % get correct sound card
 InitializePsychSound
@@ -76,13 +76,14 @@ our_device=devices(3).DeviceIndex;
 pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
      
 %% initialise serial object
-allSerialDev = serialportlist("all");
-Arduino = serial('COM5'); 
+% allSerialDev = serialportlist("all");
+Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',115200); 
 % open for usage
 fopen(Arduino);
 
 %%
-fprintf(Arduino, ['%d','%d','%d','%d','%d'], [10,10,500,10,50]);
+ fprintf(Arduino, ['%d','%d','%d','%d','%d'], [10,10,500,10,50]);
+
 
 %%
 delete(Arduino)
