@@ -72,8 +72,8 @@ PsychDefaultSetup(2);
 % get correct sound card
 InitializePsychSound
 devices = PsychPortAudio('GetDevices');
-our_device=devices(3).DeviceIndex;
-pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
+our_device=devices(2).DeviceIndex;
+%pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
      
 %% initialise serial object
 allSerialDev = serialportlist("all");
@@ -111,11 +111,15 @@ delete(Arduino)
 %     Screen('Flip',ScreenInfo.windowPtr); WaitSecs(0.5);
 %     Screen('Flip',ScreenInfo.windowPtr); WaitSecs(0.5);
 %     
-%     % start playing
-%     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
-%     PsychPortAudio('FillBuffer', pahandle, wavedata);
+    % start playing
+%     pahandle = PsychPortAudio('Open', our_device, [], 0, freq, nrchannels);
+%     PsychPortAudio('FillBuffer', pahandle, GWN);
 %     PsychPortAudio('Start', pahandle, ExpInfo.repetitions, 0, 1);   
-%     
+    
+    PsychPortAudio('FillBuffer', pahandle, GWN);
+    PsychPortAudio('Start', pahandle, 1, 0, 0);
+    WaitSecs(AudInfo.adaptationDuration);
+    PsychPortAudio('Stop', pahandle);
 %     %black screen for 0.5 seconds
 %     Screen('Flip',windowPtr);
 %     WaitSecs(0.5);
