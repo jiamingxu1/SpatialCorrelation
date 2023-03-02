@@ -82,7 +82,7 @@ Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',115200);
 fopen(Arduino);
 
 %%
- fprintf(Arduino, ['%d','%d','%d','%d','%d'], [10,10,500,10,50]);
+ fprintf(Arduino, ['%d','%d','%d','%d','%d'], [10,10,500,10,50]); 
 
 
 %%

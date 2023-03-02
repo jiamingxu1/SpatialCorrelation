@@ -1,22 +1,14 @@
-clear;
-%% establish connection
+clear all;
+%% establish connection (arduino: sendStringMessage.ino)
 arduino = serial("/dev/cu.usbmodemFD131",'BaudRate',115200);
 fopen(arduino);
-fprintf(arduino,'Hello from matlab');
+fprintf(arduino,'Hello from matlab\n');
 fscanf(arduino);
 fclose(arduino);
-clear;
-%% play a random sound
+clear all;
+%% arduino: sendSpeakeridxMatlab.ino
 arduino = serial("/dev/cu.usbmodemFD131",'BaudRate',115200);
 fopen(arduino);
-fprintf(arduino,'%s',char(2));
+fprintf(arduino,'%s',char(2)); 
 fclose(arduino);
-clear;
-%% Arduino test
-a= arduino();
-   for i = 1:10
-      writeDigitalPin(a, 'A11', 0);
-      pause(0.5);
-      writeDigitalPin(a, 'A11', 1);
-      pause(0.5);
-   end
+clear all;
