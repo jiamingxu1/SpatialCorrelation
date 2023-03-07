@@ -9,7 +9,7 @@ clear;
 %% play a random sound
 arduino = serial("/dev/cu.usbmodemFD131",'BaudRate',115200);
 fopen(arduino);
-fprintf(arduino,'%s',char(2));
+fprintf(arduino,'%s',char(111));
 fclose(arduino);
 clear;
 %% Arduino test

@@ -12,9 +12,9 @@ AudInfo.GaussianWhiteNoise  = [zeros(size(carrierSound_gwn));...
                                  AudInfo.intensity_GWN.*sineWindow_gwn.*carrierSound_gwn]; 
 
 % open arduino
-Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',115200); 
+Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',9600); 
 fopen(Arduino);
-
+fprintf(Arduino,'%d',161);
 % open speakers
 addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 PsychDefaultSetup(2);
@@ -26,5 +26,4 @@ our_device=devices(3).DeviceIndex;
 pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
 PsychPortAudio('FillBuffer',pahandle, AudInfo.GaussianWhiteNoise);
 PsychPortAudio('Start',pahandle,1,0,0);
-%fprintf(Arduino, ['%d','%d','%d','%d','%d'], [10,10,500,10,50]);
 PsychPortAudio('Stop',pahandle);
