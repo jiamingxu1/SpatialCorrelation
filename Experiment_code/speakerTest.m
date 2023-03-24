@@ -77,12 +77,18 @@ pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
      
 %% initialise serial object
 % allSerialDev = serialportlist("all");
-Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',115200); 
+Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',9600); 
 % open for usage
 fopen(Arduino);
 
 %%
- fprintf(Arduino, ['%d','%d','%d','%d','%d'], [10,10,500,10,50]);
+ fprintf(Arduino,'%s',char('<1:1>'));
+ 
+ % play sound
+pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
+PsychPortAudio('FillBuffer',pahandle, AudInfo.GaussianWhiteNoise);
+PsychPortAudio('Start',pahandle,1,0,0);
+PsychPortAudio('Stop',pahandle);
 
 
 %%
