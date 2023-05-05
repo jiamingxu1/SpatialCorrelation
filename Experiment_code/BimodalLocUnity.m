@@ -106,15 +106,15 @@ end
 
  
 %% present AV trains
-for i=1:20 %4 blocks
-    for j=1:nEvents
+for i=1:2 %4 blocks
+    for j=1:16
     input_on = ['<',num2str(1),':',num2str(audTrain(i,j)),'>'];
     fprintf(Arduino,input_on);
     %draw (buffer)
     %flip here (stimulus onset timing)
     %flip (offset)
-    PsychPortAudio('FillBuffer',pahandle, AudInfo.Beep);
-    %PsychPortAudio('FillBuffer',pahandle, AudInfo.GaussianWhiteNoise);
+   % PsychPortAudio('FillBuffer',pahandle, AudInfo.Beep);
+    PsychPortAudio('FillBuffer',pahandle, AudInfo.GaussianWhiteNoise);
     PsychPortAudio('Start',pahandle,1,0,0);
     WaitSecs(0.2)
     input_off = ['<',num2str(0),':',num2str(audTrain(i,j)),'>'];
