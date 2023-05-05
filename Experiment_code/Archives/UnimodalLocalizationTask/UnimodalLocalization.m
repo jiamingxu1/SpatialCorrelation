@@ -141,8 +141,8 @@ VSinfo.boxSize          = 201; %This is the box size for each cloud.
 VSinfo.intensity        = 10; %This determines the height of the clouds. Lowering this value will make
                                 %them have lower contrast
 %set the parameters for the visual stimuli, which consist of 10 gaussian blobs
-VSinfo.blackScreen = zeros(ScreenInfo.xaxis,ScreenInfo.yaxis);
 VSinfo.blankScreen = zeros(ScreenInfo.xaxis,ScreenInfo.yaxis);
+VSinfo.blackScreen = zeros(ScreenInfo.xaxis,ScreenInfo.yaxis);
 x                  = 1:1:VSinfo.boxSize; y = x;
 [X,Y]              = meshgrid(x,y);
 cloud              = 1e2.*mvnpdf([X(:) Y(:)],[median(x) median(y)],...

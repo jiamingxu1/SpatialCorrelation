@@ -1,6 +1,6 @@
 % This script generates two arrays of sequences (A and V) with fixed correlations
 % (-1:0.1:1) using brute force. There are 120 different pairs of AV sequences 
-% for each correlation. So the size of these arrays is {120,21}.
+% for each correlation. So the size of these arrays is {120,21}. 5/4/2023
 
 nEvents = 5;
 allSeqs = perms(1:nEvents);

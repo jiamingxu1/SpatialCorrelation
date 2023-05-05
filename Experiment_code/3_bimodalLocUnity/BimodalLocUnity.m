@@ -41,7 +41,7 @@ AudInfo.fs                  = 44100;
 audioSamples                = [linspace(1,AudInfo.fs,AudInfo.fs);
     linspace(1,AudInfo.fs,AudInfo.fs)]; 
 standardFrequency_gwn       = 10;
-AudInfo.adaptationDuration  = 0.2; %0.05 %the burst of sound will be displayed for 40 milliseconds
+AudInfo.adaptationDuration  = 0.1; %0.05 %the burst of sound will be displayed for 40 milliseconds
 duration_gwn                = size(audioSamples,2)*AudInfo.adaptationDuration;
 timeline_gwn                = linspace(1,duration_gwn,duration_gwn);
 sineWindow_gwn              = sin(standardFrequency_gwn/2*2*pi*timeline_gwn/AudInfo.fs); 
@@ -50,10 +50,19 @@ AudInfo.intensity_GWN       = 15;
 AudInfo.GaussianWhiteNoise  = [AudInfo.intensity_GWN.*sineWindow_gwn.*carrierSound_gwn;...
     AudInfo.intensity_GWN.*sineWindow_gwn.*carrierSound_gwn];
 
+%% make auditory stimuli (beep)
+    AudInfo.fs                           = 44100;
+    AudInfo.stimDura                     = 0.1; % ExpInfo.stimFrame * ScreenInfo.ifi; %s, the duration of auditory stimulus
+    AudInfo.tf                           = 500;
+    AudInfo.beepLengthSecs               = AudInfo.stimDura;
+    beep                                 = MakeBeep(AudInfo.tf, AudInfo.beepLengthSecs, AudInfo.fs);
+    AudInfo.Beep                         = [beep; beep];
+
+
 %% Create auditory/visual train
 
 locs            = 1:1:16;
-numTotalLocs    = length(AudInfo.locs);
+numTotalLocs    = length(locs);
 nEvents         = 5;
 iniTrainLoc     = 1:1:11;
 nTrials       = 10; % for testing
@@ -68,27 +77,29 @@ end
                              
 %% Open speakers and create sound stimuli 
 
-addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 PsychDefaultSetup(2);
 % get correct sound card
 InitializePsychSound
 devices = PsychPortAudio('GetDevices');
 our_device=devices(3).DeviceIndex;
 pahandle = PsychPortAudio('Open', our_device, [], [], [], 2);%open device
-PsychPortAudio('FillBuffer',pahandle, AudInfo.GaussianWhiteNoise);
+%PsychPortAudio('FillBuffer',pahandle, AudInfo.GaussianWhiteNoise);
+PsychPortAudio('FillBuffer',pahandle, AudInfo.Beep);
+
      
 %% initialise serial object
 % allSerialDev = serialportlist("all");
 Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',9600); 
 % open for usage
 fopen(Arduino);
-
-fprintf(Arduino,'<0:1,4,5>');
-%fscanf(Arduino) %for debugging
+% for debugging only
+% fprintf(Arduino,'<0:1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16>');
+% fprintf(Arduino,'<1:16>');
+% fscanf(Arduino) 
  
-%% play sound
+%% Test all the speakers to make sure everything works
 for i=1:2
-    for j=1:nEvents
+    for j=1:16
     input_on = ['<',num2str(1),':',num2str(audTrain(i,j)),'>'];
     fprintf(Arduino,input_on);
     %draw (buffer)
@@ -99,11 +110,10 @@ for i=1:2
     input_off = ['<',num2str(0),':',num2str(audTrain(i,j)),'>'];
     fprintf(Arduino,input_off);   
     PsychPortAudio('Stop',pahandle);
-    WaitSecs(0.2)
+    WaitSecs(0.15)
     end
     WaitSecs(0.5)
 end
-
 
 %%
 fclose(Arduino)
@@ -133,11 +143,15 @@ delete(Arduino)
 %     Screen('Flip',ScreenInfo.windowPtr); WaitSecs(0.5);
 %     Screen('Flip',ScreenInfo.windowPtr); WaitSecs(0.5);
 %     
-%     % start playing
-%     pahandle = PsychPortAudio('Open', device, [], 0, freq, nrchannels);
-%     PsychPortAudio('FillBuffer', pahandle, wavedata);
+    % start playing
+%     pahandle = PsychPortAudio('Open', our_device, [], 0, freq, nrchannels);
+%     PsychPortAudio('FillBuffer', pahandle, GWN);
 %     PsychPortAudio('Start', pahandle, ExpInfo.repetitions, 0, 1);   
-%     
+    
+    PsychPortAudio('FillBuffer', pahandle, GWN);
+    PsychPortAudio('Start', pahandle, 1, 0, 0);
+    WaitSecs(AudInfo.adaptationDuration);
+    PsychPortAudio('Stop', pahandle);
 %     %black screen for 0.5 seconds
 %     Screen('Flip',windowPtr);
 %     WaitSecs(0.5);

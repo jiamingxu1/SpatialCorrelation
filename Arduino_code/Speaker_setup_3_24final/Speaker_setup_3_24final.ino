@@ -1,4 +1,4 @@
-const int speakerPins[] = {A1, 5, A0, 6, 12, 7, 13, 8, A2, 9, A3, 4, A4, 10, A5, 11};
+const int speakerPins[] = {10, 11, 8, 9, 6, 7, 4, 5, 13, 12, A4, A5, A1, A0, A2, A3};
 const int numSpeakers = 16;
 
 void setup() {
