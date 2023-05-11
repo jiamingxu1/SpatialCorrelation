@@ -3,11 +3,11 @@ addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 
 % make auditory stimuli 
 AudInfo.fs                           = 44100;
-    AudInfo.stimDura                     = 0.1; % ExpInfo.stimFrame * ScreenInfo.ifi; %s, the duration of auditory stimulus
-    AudInfo.tf                           = 500;
-    AudInfo.beepLengthSecs               = AudInfo.stimDura;
-    beep                                 = MakeBeep(AudInfo.tf, AudInfo.beepLengthSecs, AudInfo.fs);
-    AudInfo.Beep                         = [beep; beep];
+AudInfo.stimDura                     = 0.1; % ExpInfo.stimFrame * ScreenInfo.ifi; %s, the duration of auditory stimulus
+AudInfo.tf                           = 500;
+AudInfo.beepLengthSecs               = AudInfo.stimDura;
+beep                                 = MakeBeep(AudInfo.tf, AudInfo.beepLengthSecs, AudInfo.fs);
+AudInfo.Beep                         = [beep; beep];
 
 % initialize ptb
 PsychDefaultSetup(2);
@@ -27,7 +27,7 @@ fopen(Arduino);
 % fscanf(Arduino) 
 % ------------------------------------------------------------
 
-% test all speakers
+%% test all speakers
 left = 1:1:16;
 right = 16:-1:1;
 audTrain = [left; right];
@@ -47,4 +47,5 @@ for i=1:2
     end
     WaitSecs(0.5)
 end
+
 

@@ -1,7 +1,7 @@
 %This function takes the locations of centroids, VSinfo and ScreenInfo as inputs
 %and generate a texture of clouds
-function dotClouds = generateOneBlob(windowPtr,loc,VSinfo,ScreenInfo)
-    loc = round(loc);
+function dotClouds = generateOneBlob(windowPtr,blob_coordinates,VSinfo,ScreenInfo)
+    loc = round(blob_coordinates);
     %define where to draw the blob center - 0.5 box size in all directions
     %make that region brighter - define as VSinfo.Cloud
     VSinfo.transCanvas((loc(1)-floor(VSinfo.boxSize/2)):...

@@ -106,8 +106,8 @@ for ii = 1:nSeq
         Corr(ii,jj) = corr(allSeqs(ii,:)',allSeqs(jj,:)');
     end
 end
-CorrReshape = reshape(Corr, 1,[]);
-figure; histogram(CorrReshape,20)
+% CorrReshape = reshape(Corr, 1,[]);
+% figure; histogram(CorrReshape,20)
     
 % construct two arrays with A,V sequences with fixed corr
 CorrVal = -1:0.1:1;
