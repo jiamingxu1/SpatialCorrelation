@@ -1,4 +1,4 @@
-function  ScreenInfo = setup_screen(display)
+function  ScreenInfo = setup_screen3(display)
 
 switch display
     case 1 % testing room
@@ -13,18 +13,21 @@ switch display
 end
         Screen('Preference', 'VisualDebugLevel', 1);
 %         Screen('Preference', 'SkipSyncTests', 1);
-        
+      
         Screen('TextSize', ScreenInfo.windowPtr, 35) ;   
         Screen('TextFont',ScreenInfo.windowPtr,'Times');
         Screen('TextStyle',ScreenInfo.windowPtr,1); 
 
         [center(1), center(2)]     = RectCenter(rect);
-        ScreenInfo.numPixels_perCM = 7.5;
-        ScreenInfo.centerOffset    = 1.5*ScreenInfo.numPixels_perCM;
-        ScreenInfo.xmid            = center(1)-ScreenInfo.centerOffset; % horizontal center
+        %Screen size by the project = 1024 pixels x 768 pixels
+        %Screen size in cm = 165 x 123.5
+        ScreenInfo.numPixels_perCM = 6.2; % pixel/cm
+        ScreenInfo.xmid            = center(1); % horizontal center
         ScreenInfo.ymid            = center(2); % vertical center
         ScreenInfo.backgroundColor = 0;
-        ScreenInfo.liftingYaxis    = 300; 
+        ScreenInfo.liftingYaxis    = 226; % speaker center height
+        ScreenInfo.cursorColor     = [0,0,255]; %A: blue, V:red
+        ScreenInfo.dispModality    = 'A'; %always localize the auditory component
 
         %fixation locations
         ScreenInfo.x1_lb = ScreenInfo.xmid-7; ScreenInfo.x2_lb = ScreenInfo.xmid-1;

@@ -23,8 +23,8 @@ ScreenInfo.liftingYaxis    = 304.25; %300;
 % Written and copyrighted by Ajay Subramanian, a forgotten author
 ExpInfo.sittingDistance = 113.0;
 ExpInfo.speaker2screen = 21.0;
-ExpInfo.leftspeaker2center = 67.5;
-ExpInfo.rightspeaker2center = 67.5;
+ExpInfo.leftspeaker2center = 65.5;
+ExpInfo.rightspeaker2center = 65.5;
 ExpInfo.leftmostVisualAngle = (180/pi) * atan(ExpInfo.leftspeaker2center / ...
     (ExpInfo.speaker2screen + ExpInfo.sittingDistance));
 ExpInfo.rightmostVisualAngle = (180/pi) * atan(ExpInfo.rightspeaker2center / ...
