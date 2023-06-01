@@ -19,11 +19,13 @@ end
         Screen('TextStyle',ScreenInfo.windowPtr,1); 
 
         [center(1), center(2)]     = RectCenter(rect);
-        ScreenInfo.numPixels_perCM = 7.5;
+        %Screen size by the project = 1024 pixels x 768 pixels
+        %Screen size in cm = 165 x 123.5
+        ScreenInfo.numPixels_perCM = 6.2; % pixel/cm
         ScreenInfo.xmid            = center(1); % horizontal center
         ScreenInfo.ymid            = center(2); % vertical center
         ScreenInfo.backgroundColor = 0;
-        ScreenInfo.liftingYaxis    = 304.25; % speaker center height
+        ScreenInfo.liftingYaxis    = 226; % speaker center height
         ScreenInfo.cursorColor     = [0,0,255]; %A: blue, V:red
         ScreenInfo.dispModality    = 'A'; %always localize the auditory component
 

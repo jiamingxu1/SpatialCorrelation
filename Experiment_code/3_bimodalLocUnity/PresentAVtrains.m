@@ -1,45 +1,44 @@
 function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
-    ExpInfo,ScreenInfo,VSinfo,AudInfo,pahandle,windowPtr)
-    %----------------------------------------------------------------------
-    %-----------Calculate the coordinates of the target stimuli------------
-    %----------------------------------------------------------------------
-    %display visual stimuli
-    targetLoc = round(ScreenInfo.xmid + ScreenInfo.numPixels_perCM.*...
-                VSinfo.arrangedLocs_cm(TrialNum));
-    
-    %Make visual stimuli
-    blob_coordinates = [targetLoc, ScreenInfo.liftingYaxis];    
-    dotCloud = generateOneBlob(windowPtr,blob_coordinates,VSinfo,ScreenInfo);
-
-    %----------------------------------------------------------------------
-    %---------------------display audiovisual stimuli----------------------
-    %----------------------------------------------------------------------
+    nEvents,ExpInfo,ScreenInfo,VSinfo,AudInfo,Arduino,pahandle,windowPtr)
+   
     %show fixation cross for 0.1 s and then a blank screen for 0.5 s
-    Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x1_lb,...
-        ScreenInfo.y1_lb, ScreenInfo.x1_ub, ScreenInfo.y1_ub]);
-    Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x2_lb,...
-        ScreenInfo.y2_lb, ScreenInfo.x2_ub, ScreenInfo.y2_ub]);
-    Screen('Flip',windowPtr); WaitSecs(0.5);
-    Screen('Flip',windowPtr); WaitSecs(0.5);
-    
-    
-for ii = 1:2 % AV sequences
-    for jj = 1:nEvents
-    input_on = ['<',num2str(1),':',num2str(audTrain(ii,jj)),'>'];
-    fprintf(Arduino,input_on);
-    PsychPortAudio('FillBuffer',pahandle, AudInfo.Beep);
-    PsychPortAudio('Start',pahandle,1,0,0);
-    for kk = 1:VSinfo.numFrames 
-            Screen('DrawTexture',windowPtr,dotCloud,[],...
-                [0,0,ScreenInfo.xaxis,ScreenInfo.yaxis]);
-            Screen('Flip',windowPtr);
-    end 
-    %WaitSecs(0.2)
-    input_off = ['<',num2str(0),':',num2str(audTrain(ii,jj)),'>'];
-    fprintf(Arduino,input_off);   
-    PsychPortAudio('Stop',pahandle);
-    %WaitSecs(0.15)
-end
+        Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x1_lb,...
+            ScreenInfo.y1_lb, ScreenInfo.x1_ub, ScreenInfo.y1_ub]);
+        Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.x2_lb,...
+            ScreenInfo.y2_lb, ScreenInfo.x2_ub, ScreenInfo.y2_ub]);
+        Screen('Flip',windowPtr); WaitSecs(0.5);
+        Screen('Flip',windowPtr); WaitSecs(0.5);
+
+    for s = 1:nEvents % single events
+        %Calculate the coordinates of the target stimuli
+        VSinfo.arrangedLocs_deg = VSinfo.Distance(ExpInfo.Vtrain{TrialNum}(s));
+        VSinfo.arrangedLocs_cm  = round(tan(deg2rad(VSinfo.arrangedLocs_deg)).*ExpInfo.sittingDistance,2);
+        targetLoc = round(ScreenInfo.xmid + ScreenInfo.numPixels_perCM.*...
+                    VSinfo.arrangedLocs_cm);
+        %Make visual stimuli
+        blob_coordinates = [targetLoc, ScreenInfo.liftingYaxis];    
+        dotCloud = generateOneBlob(windowPtr,blob_coordinates,VSinfo,ScreenInfo);
+
+        %----------------------------------------------------------------------
+        %---------------------display audiovisual stimuli----------------------
+        %----------------------------------------------------------------------
+        
+        %present the audiovisal single event pair    
+        input_on = ['<',num2str(1),':',num2str(ExpInfo.Atrain{TrialNum}(s)),'>'];
+        fprintf(Arduino,input_on);
+        PsychPortAudio('FillBuffer',pahandle, AudInfo.Beep);
+        PsychPortAudio('Start',pahandle,1,0,0);
+            for kk = 1:VSinfo.numFrames 
+                    Screen('DrawTexture',windowPtr,dotCloud,[],...
+                        [0,0,ScreenInfo.xaxis,ScreenInfo.yaxis]);
+                    Screen('Flip',windowPtr);
+            end 
+        WaitSecs(0.2)
+        input_off = ['<',num2str(0),':',num2str(ExpInfo.Atrain{TrialNum}(s)),'>'];
+        fprintf(Arduino,input_off);   
+        PsychPortAudio('Stop',pahandle);
+        WaitSecs(0.15)
+    end     
 
     %----------------------------------------------------------------------
     %--------------Record response using the pointing device---------------
@@ -63,7 +62,7 @@ end
     RT1            = toc;
     Response_pixel = x;
     Response_cm    = (Response_pixel - ScreenInfo.xmid)/ScreenInfo.numPixels_perCM;
-    localization   = rad2deg(atan(Response_cm/ExpInfo.sittingDistance));
+    localization   = (180/pi)*(atan(Response_cm/ExpInfo.sittingDistance));
     Screen('Flip',windowPtr); WaitSecs(0.1);
     
     %Unity judgment
@@ -91,4 +90,5 @@ end
     else
         unity = NaN; RT2 = NaN; 
     end
+    
 end
