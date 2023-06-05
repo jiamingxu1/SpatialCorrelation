@@ -232,8 +232,38 @@ for i = 1:(AudInfo.numTotalTrialsA+VSinfo.numTotalTrialsV)
         jj = sum(ExpInfo.order_VSnAS(1:i)==1);
         %randomly sample one sequence from the corresponding col of ExpInfo.Atrain
         AudInfo.randSampleAtrain(jj) = randsample(ExpInfo.Atrain(:,colidx),1); 
-        [AudInfo.data(2,jj), AudInfo.data(3,jj)] = PresentAuditoryTrain(i,jj,...
-            ExpInfo,ScreenInfo,AudInfo,Arduino,pahandle,windowPtr);
+%         [AudInfo.data(2,jj), AudInfo.data(3,jj)] = PresentAuditoryTrain(i,jj,...
+%             ExpInfo,ScreenInfo,AudInfo,Arduino,pahandle,windowPtr);
+        Atrain = cell2mat(AudInfo.randSampleAtrain(jj));
+        for s = 1:length(Atrain)
+            if rem(Atrain(s),2) == 1 %turn on one speaker, full volume
+                %present the audiovisal single event pair    
+                input_on = ['<',num2str(1),':',num2str((Atrain(s)+1)/2),'>'];
+                fprintf(Arduino,input_on);
+                PsychPortAudio('FillBuffer',pahandle, AudInfo.GaussianWhiteNoise);
+                PsychPortAudio('Start',pahandle,1,0,0);
+                WaitSecs(0.1)
+                input_off = ['<',num2str(0),':',num2str((Atrain(s)+1)/2),'>'];
+                fprintf(Arduino,input_off);   
+                PsychPortAudio('Stop',pahandle);
+                WaitSecs(0.15)
+
+            else %play sound in-between two speakers, half volume
+                %present the audiovisal single event pair    
+                input_on = ['<',num2str(1),':',num2str(Atrain(s)/2),',',...
+                    num2str(Atrain(s)/2+1),'>'];
+                fprintf(Arduino,input_on);
+                PsychPortAudio('FillBuffer',pahandle, AudInfo.inBetweenGWN);
+                PsychPortAudio('Start',pahandle,1,0,0);
+                WaitSecs(0.1)
+                input_off = ['<',num2str(0),':',num2str(Atrain(s)/2),',',...
+                    num2str(Atrain(s)/2+1),'>'];
+                fprintf(Arduino,input_off);   
+                PsychPortAudio('Stop',pahandle);
+                WaitSecs(0.15)
+            end
+
+        end 
     
     else %visual trial
         ii = sum(ExpInfo.order_VSnAS(1:i)==2);

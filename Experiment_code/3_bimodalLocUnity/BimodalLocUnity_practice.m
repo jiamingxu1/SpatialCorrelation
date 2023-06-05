@@ -126,12 +126,12 @@ end
 % figure; histogram(CorrReshape,20)
     
 % construct two arrays with A,V sequences with fixed corr
-CorrVal = -1:0.1:1;
+CorrVal = -1:0.5:1;
 nCorr = length(CorrVal); 
 nCorrRep = 120; % number of sequences for each correlation
-CorrSortedA = cell(nCorrRep,nCorr); %120*21
+CorrSortedA = cell(nCorrRep,nCorr); %120*5
 CorrSortedV = cell(nCorrRep,nCorr);
-idxA = NaN(nCorrRep,nCorr); %120*21
+idxA = NaN(nCorrRep,nCorr); %120*5
 idxV = NaN(nCorrRep,nCorr);
 for i = 1:nCorr
     [idxA_temp,idxV_temp] = find(Corr > CorrVal(i)-1e-5 &...
@@ -147,16 +147,20 @@ for i = 1:nCorr
     end
 end
 
-% reshape and shuffle
-Atrain_temp         = reshape(CorrSortedA, [], 1); %2520*1
-Vtrain_temp         = reshape(CorrSortedV, [], 1); %2520*1
-randidx             = randperm(2520);
+% reshape 
+Atrain_temp         = reshape(CorrSortedA, [], 1); %600*1
+Vtrain_temp         = reshape(CorrSortedV, [], 1); %600*1
+CorrAV_ordered = NaN(600,1); %check corr
+for i = 1:600
+    CorrAV_ordered(i) = corr(Atrain_temp{i}',Vtrain_temp{i}');
+end
+
+% shuffle
+randidx             = randperm(600);
 ExpInfo.Atrain      = Atrain_temp(randidx);
 ExpInfo.Vtrain      = Vtrain_temp(randidx);
-
-% check corr
-ExpInfo.CorrAV = NaN(2520,1);
-for i = 1:2520
+ExpInfo.CorrAV      = NaN(600,1); %check corr
+for i = 1:600
     ExpInfo.CorrAV(i) = corr(ExpInfo.Atrain{i}',ExpInfo.Vtrain{i}');
 end
 
