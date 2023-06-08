@@ -23,6 +23,12 @@ while isempty(ExpInfo.session) == 1
     end
 end
 
+%load the AV sequences with fixed correlations 
+load('AVseqsFixedCorrs.mat');
+ExpInfo.Atrain = AVseqsFixedCorrs{1,1};
+ExpInfo.Vtrain = AVseqsFixedCorrs{1,2};
+out1FileName   = ['UnimodalLocSeq_sub', num2str(ExpInfo.subjID)];
+
 %% Screen Setup 
 Screen('Preference', 'VisualDebugLevel', 1);
 Screen('Preference', 'SkipSyncTests', 1);
@@ -107,64 +113,6 @@ VSinfo.blk_texture                   = Screen('MakeTexture', windowPtr, VSinfo.b
     
 %% Define experiment information
 
-% -------------------- Correlation ----------------------------------------
-% Create auditory and visual trains with fixed corrs. Shuffled AV sequences
-% with randomized corr values are saved in ExpInfo.Atrain and ExpInfo.Vtrain, and the
-% corresponding corr value of all AV pairs are saved in ExpInfo.corrAV (ordered). 
-nEvents = 5;
-allSeqs = perms(1:nEvents);
-nSeq = size(allSeqs,1);
-
-% AV corr matrix
-Corr = NaN(nSeq, nSeq);
-for ii = 1:nSeq
-    for jj = 1:nSeq
-        Corr(ii,jj) = corr(allSeqs(ii,:)',allSeqs(jj,:)');
-    end
-end
-% CorrReshape = reshape(Corr, 1,[]);
-% figure; histogram(CorrReshape,20)
-    
-% construct two arrays with A,V sequences with fixed corr
-CorrVal = -1:0.5:1;
-nCorr = length(CorrVal); 
-nCorrRep = 120; % number of sequences for each correlation
-CorrSortedA = cell(nCorrRep,nCorr); %120*5
-CorrSortedV = cell(nCorrRep,nCorr);
-idxA = NaN(nCorrRep,nCorr); %120*5
-idxV = NaN(nCorrRep,nCorr);
-for i = 1:nCorr
-    [idxA_temp,idxV_temp] = find(Corr > CorrVal(i)-1e-5 &...
-        Corr < CorrVal(i)+1e-5); 
-    idx_subset = randsample(length(idxA_temp),nCorrRep);
-    idxA(:,i) = idxA_temp(idx_subset);
-    idxV(:,i) = idxV_temp(idx_subset); 
-    % idxA,V correspond to the row numbers in allSeqs. Next, fetch the sequences 
-    % from allSeqs and put them into CorrSortedA and CorrSortedV
-    for j = 1:nCorrRep
-        CorrSortedA{j,i} = allSeqs(idxA(j,i),1:end);
-        CorrSortedV{j,i} = allSeqs(idxV(j,i),1:end);
-    end
-end
-
-% reshape 
-Atrain_temp         = reshape(CorrSortedA, [], 1); %600*1
-Vtrain_temp         = reshape(CorrSortedV, [], 1); %600*1
-CorrAV_ordered = NaN(600,1); %check corr
-for i = 1:600
-    CorrAV_ordered(i) = corr(Atrain_temp{i}',Vtrain_temp{i}');
-end
-
-% shuffle
-randidx             = randperm(600);
-ExpInfo.Atrain      = Atrain_temp(randidx);
-ExpInfo.Vtrain      = Vtrain_temp(randidx);
-ExpInfo.CorrAV      = NaN(600,1); %check corr
-for i = 1:600
-    ExpInfo.CorrAV(i) = corr(ExpInfo.Atrain{i}',ExpInfo.Vtrain{i}');
-end
-
-% ------------------ Other experiment information ------------------------
 ExpInfo.numTrials         = 1;%for each AV pair
 ExpInfo.numAVpairs        = length(ExpInfo.CorrAV); %2520 possible pairs 
 ExpInfo.numTotalTrials    = ExpInfo.numTrials * ExpInfo.numAVpairs;
