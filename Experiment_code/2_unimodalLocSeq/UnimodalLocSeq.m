@@ -15,7 +15,7 @@ while isempty(ExpInfo.subjID) == 1
     end
 end
 
-%load the AV sequences with fixed correlations 0
+%load the AV sequences with fixed correlations 
 D = load('generatedAVseqs.mat');
 ExpInfo.Atrain = D.generatedAVseqs{1,1};
 ExpInfo.Vtrain = D.generatedAVseqs{1,2};
@@ -42,7 +42,6 @@ Screen('TextStyle',windowPtr,1);
 [center(1), center(2)]     = RectCenter(rect);
 ScreenInfo.xmid            = center(1); % horizontal center
 ScreenInfo.ymid            = center(2); % vertical center
-% ScreenInfo.backgroundColor = 105;
 ScreenInfo.numPixels_perCM = 6.2;
 ScreenInfo.liftingYaxis    = 270; 
 ifi = Screen('GetFlipInterval', windowPtr);
@@ -100,7 +99,7 @@ VSinfo.x                             = x; VSinfo.y = y;
 [X,Y]                                = meshgrid(x,y);
 cloud_temp                           = mvnpdf([X(:) Y(:)],[median(x) median(y)],...
                                        [VSinfo.width 0; 0 VSinfo.width]);
-pscale                               = (1-pblack)/max(cloud_temp); % th0e max contrast of the blob adds the background contrast should <= 1
+pscale                               = (1-pblack)/max(cloud_temp); % the max contrast of the blob adds the background contrast should <= 1
 cloud_temp                           = cloud_temp .* pscale;
 VSinfo.Cloud                         = VSinfo.scaling.*reshape(cloud_temp,length(x),length(y))*255;
 VSinfo.blk_texture                   = Screen('MakeTexture', windowPtr, VSinfo.blackBackground,[],[],[],2);
