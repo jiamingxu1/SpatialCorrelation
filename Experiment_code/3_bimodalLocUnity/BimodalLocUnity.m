@@ -127,21 +127,9 @@ ExpInfo.disc                         = [-20 -10 0 10 20];
 ExpInfo.numDisc                      = length(ExpInfo.disc);
 ExpInfo.numReps                      = 40; %2 for practice, 40 for the real experiment 
 ExpInfo.AVpairs_allComb              = combvec(1:ExpInfo.numCorr, 1:ExpInfo.numDisc);
+% 2*25, 1st row = 5 disc levels, 2nd row = 5 correlations
 ExpInfo.numAVpairs                   = size(ExpInfo.AVpairs_allComb, 2);
 ExpInfo.numTotalTrials               = ExpInfo.numReps * ExpInfo.numAVpairs; %1000 trials
-
-% Put all different trial types together and shuffle them 
-% For each block, each trial type is presented 250/25 = 10 times
-ExpInfo.AVpairs_order     = [];
-for i = 1:ExpInfo.numReps
-    ExpInfo.AVpairs_order = [ExpInfo.AVpairs_order, randperm(ExpInfo.numAVpairs)];
-end
-
-% For loc task, shuffle trial types (if 1: localize A; if 2: localize V)
-ExpInfo.order_VSnAS     = [];
-for i = 1:ExpInfo.numTotalTrials
-    ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
-end
 
 % For each discrepancy level, shuffle A/V centroids 
 % A: [-24 -14 -4 6 16 26]
@@ -150,14 +138,57 @@ end
 AVcentroids_allCombs = NaN(3,36); ExpInfo.AVcentroids_allCombs = NaN(3,24);
 AVcentroids_allCombs(1:2,:) = combvec(ExpInfo.centroids, ExpInfo.centroids);
 AVcentroids_allCombs(3,:)   = AVcentroids_allCombs(2,:) - AVcentroids_allCombs(1,:);
-% [temp,order]                = sort(AVcentroids_allCombs(3,:)); %sort with disc level
-% AVcentroids_allCombs        = AVcentroids_allCombs(:,order);
+[temp,order]                = sort(AVcentroids_allCombs(3,:)); %sort with disc level
+AVcentroids_allCombs        = AVcentroids_allCombs(:,order);
 [ridx,cidx] = find(AVcentroids_allCombs(3,:)<=20 & AVcentroids_allCombs(3,:)>=-20);
 ExpInfo.AVcentroids_allCombs = AVcentroids_allCombs(1:2,cidx); %24 pairs in total
 ExpInfo.AVcentroids_allCombs(3,:) = ExpInfo.AVcentroids_allCombs(2,:) -...
     ExpInfo.AVcentroids_allCombs(1,:); %24 AV pairs with disc levels 
+% 1st row: auditory centroids
+% 2nd row: corresponding visual centroids
+% 3rd row: disc
+AVcentroids_allCombsIdx = NaN(3,24);
+for i = 1:2
+    for j = 1:24
+        AVcentroids_allCombsIdx(i,j) = find(ExpInfo.centroids == ExpInfo.AVcentroids_allCombs(i,j));
+    end
+end     
+AVcentroids_allCombsIdx(3,:) = ExpInfo.AVcentroids_allCombs(3,:);
+% 1st row: auditory centroid idx
+% 2nd row: corresponding visual centroid idx
+% 3rd row: disc
 
-% HERE!!!!
+
+% Trial conditions for all 1000 trials (condition idx: 1-25, these are the column
+% indeces of ExpInfo.AVpairs_allComb. Each col contains a disc idx and a corr idx)
+% For each block, each trial type is presented 250/25 = 10 times
+ExpInfo.AVpairs_order     = [];
+for i = 1:ExpInfo.numReps
+    ExpInfo.AVpairs_order = [ExpInfo.AVpairs_order, randperm(ExpInfo.numAVpairs)];
+end
+% For ExpInfo.trialCondition, 1st row: A centroid idx; 2nd row: V centroid
+% idx; 3rd row: corr val (use ExpInfo.AVpairs_order to find corresponding
+% disc & corr for each trial
+ExpInfo.trialConditions = NaN(3,ExpInfo.numTotalTrials);
+for i = 1:ExpInfo.numTotalTrials
+    AVpairIdx_temp = ExpInfo.AVpairs_allComb(:,i);
+    disc_temp = AVpairIdx_temp(1); %disc idx
+    corr_temp = AVpairIdx_temp(2); %corr idx
+    [ridx,cidx] = find(AVcentroids_allCombsIdx(3,:)==ExpInfo.disc(disc_temp)); 
+    %cidx stores the col idx of the AV pairs (A&V centroid idx) with that disc level 
+    ExpInfo.trialCondition(1:2,i) = AVcentroids_allCombsIdx(1:2,randsample(cidx,1));
+    ExpInfo.trialConditions(3,i) = ExpInfo.corrVals(corr_temp);
+end
+    
+% HERE!!!!!
+
+% For loc task, shuffle trial types (if 1: localize A; if 2: localize V)
+ExpInfo.order_VSnAS     = [];
+for i = 1:ExpInfo.numTotalTrials
+    ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
+end
+
+% Initialize data matrices for loc and unity 
 
 
 rand_indicesA = []; %stores centroid indices 
