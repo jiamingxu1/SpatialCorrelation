@@ -24,6 +24,7 @@ while isempty(ExpInfo.session) == 1
 end
 
 %load the AV sequences with fixed correlations 0
+addpath(genpath('/e/3.3/p3/hong/Desktop/GitHub/SpatialCorrelation/Experiment_code/2_unimodalLocSeq'));
 D = load('generatedAVseqs.mat');
 ExpInfo.Atrain = D.generatedAVseqs{1,1};
 ExpInfo.Vtrain = D.generatedAVseqs{1,2};
@@ -119,22 +120,46 @@ ExpInfo.LRmostVisualAngle            = (180/pi) * atan(ExpInfo.LRmostSpeakers2ce
 ExpInfo.stimLocs                     = linspace(-30,30,31); %in deg
 ExpInfo.numLocs                      = length(ExpInfo.stimLocs);
 ExpInfo.centroids                    = ExpInfo.stimLocs([4,9,14,19,24,29]);
-ExpInfo.numCentroids                 = 6;
-ExpInfo.numTrialsPerLoc              = 40; %2 for practice, 60 for the real experiment
-AudInfo.numTotalTrialsA              = ExpInfo.numTrialsPerLoc * ExpInfo.numCentroids;
-VSinfo.numTotalTrialsV               = ExpInfo.numTrialsPerLoc * ExpInfo.numCentroids;
+ExpInfo.numCentroids                 = length(ExpInfo.centroids);
+ExpInfo.corrVals                     = D.CorrVal;
+ExpInfo.numCorr                      = length(ExpInfo.corrVals);
+ExpInfo.disc                         = [-20 -10 0 10 20];
+ExpInfo.numDisc                      = length(ExpInfo.disc);
+ExpInfo.numReps                      = 40; %2 for practice, 40 for the real experiment 
+ExpInfo.AVpairs_allComb              = combvec(1:ExpInfo.numCorr, 1:ExpInfo.numDisc);
+ExpInfo.numAVpairs                   = size(ExpInfo.AVpairs_allComb, 2);
+ExpInfo.numTotalTrials               = ExpInfo.numReps * ExpInfo.numAVpairs; %1000 trials
 
-ExpInfo.numAVpairs        = length(ExpInfo.CorrAV); %2520 possible pairs 
-ExpInfo.numTotalTrials    = ExpInfo.numTrials * ExpInfo.numAVpairs;
-ExpInfo.bool_unityReport  = ones(1,ExpInfo.numTotalTrials);%1: insert unity judgment
-                                  
-% the order of presenting V/A (if 1: A; %if 2: V)
+% Put all different trial types together and shuffle them 
+% For each block, each trial type is presented 250/25 = 10 times
+ExpInfo.AVpairs_order     = [];
+for i = 1:ExpInfo.numReps
+    ExpInfo.AVpairs_order = [ExpInfo.AVpairs_order, randperm(ExpInfo.numAVpairs)];
+end
+
+% For loc task, shuffle trial types (if 1: localize A; if 2: localize V)
 ExpInfo.order_VSnAS     = [];
-for i = 1:AudInfo.numTotalTrialsA
+for i = 1:ExpInfo.numTotalTrials
     ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
 end
 
-% shuffle A/V centroid locations
+% For each discrepancy level, shuffle A/V centroids 
+% A: [-24 -14 -4 6 16 26]
+% V: [-24 -14 -4 6 16 26]
+% disc: [-20 -10 0 10 20]
+AVcentroids_allCombs = NaN(3,36); ExpInfo.AVcentroids_allCombs = NaN(3,24);
+AVcentroids_allCombs(1:2,:) = combvec(ExpInfo.centroids, ExpInfo.centroids);
+AVcentroids_allCombs(3,:)   = AVcentroids_allCombs(2,:) - AVcentroids_allCombs(1,:);
+% [temp,order]                = sort(AVcentroids_allCombs(3,:)); %sort with disc level
+% AVcentroids_allCombs        = AVcentroids_allCombs(:,order);
+[ridx,cidx] = find(AVcentroids_allCombs(3,:)<=20 & AVcentroids_allCombs(3,:)>=-20);
+ExpInfo.AVcentroids_allCombs = AVcentroids_allCombs(1:2,cidx); %24 pairs in total
+ExpInfo.AVcentroids_allCombs(3,:) = ExpInfo.AVcentroids_allCombs(2,:) -...
+    ExpInfo.AVcentroids_allCombs(1,:); %24 AV pairs with disc levels 
+
+% HERE!!!!
+
+
 rand_indicesA = []; %stores centroid indices 
 for i = 1:ExpInfo.numTrialsPerLoc; rand_indicesA = [rand_indicesA, randperm(6)]; end
 rand_indicesV = [];
