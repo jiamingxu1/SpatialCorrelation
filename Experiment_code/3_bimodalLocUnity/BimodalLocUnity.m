@@ -25,10 +25,11 @@ end
 
 %load the AV sequences with fixed correlations 0
 addpath(genpath('/e/3.3/p3/hong/Desktop/GitHub/SpatialCorrelation/Experiment_code/2_unimodalLocSeq'));
-D = load('generatedAVseqs.mat');
-ExpInfo.Atrain = D.generatedAVseqs{1,1};
-ExpInfo.Vtrain = D.generatedAVseqs{1,2};
-out1FileName   = ['BimodalLocSeq_sub', num2str(ExpInfo.subjID)];
+D = load('AVseqsFixedCorrs.mat');
+ExpInfo.Atrain      = D.AVseqsFixedCorrs{1,1};
+ExpInfo.Vtrain      = D.AVseqsFixedCorrs{1,2};
+ExpInfo.orderedCorr = D.AVseqsFixedCorrs{1,3};
+out1FileName        = ['BimodalLocSeq_sub', num2str(ExpInfo.subjID)];
 
 %% Screen Setup 
 Screen('Preference', 'VisualDebugLevel', 1);
@@ -53,6 +54,13 @@ ScreenInfo.xmid            = center(1); % horizontal center
 ScreenInfo.ymid            = center(2); % vertical center
 ScreenInfo.numPixels_perCM = 6.2;
 ScreenInfo.liftingYaxis    = 270; 
+ScreenInfo.cursorColorA    = [0,0,255]; 
+ScreenInfo.cursorColorV    = [255,255,0]; %A: blue, V:yellow
+ScreenInfo.dispModalityA   = 'A';
+ScreenInfo.dispModalityV   = 'V';
+ScreenInfo.x_box_unity     = [-95, -32; 35, 98];
+ScreenInfo.y_box_unity     = [-10, 22];
+
 ifi = Screen('GetFlipInterval', windowPtr);
 
 %fixation locations
@@ -121,7 +129,7 @@ ExpInfo.stimLocs                     = linspace(-30,30,31); %in deg
 ExpInfo.numLocs                      = length(ExpInfo.stimLocs);
 ExpInfo.centroids                    = ExpInfo.stimLocs([4,9,14,19,24,29]);
 ExpInfo.numCentroids                 = length(ExpInfo.centroids);
-ExpInfo.corrVals                     = D.CorrVal;
+ExpInfo.corrVals                     = -1:0.5:1;
 ExpInfo.numCorr                      = length(ExpInfo.corrVals);
 ExpInfo.disc                         = [-20 -10 0 10 20];
 ExpInfo.numDisc                      = length(ExpInfo.disc);
@@ -166,71 +174,107 @@ ExpInfo.AVpairs_order     = [];
 for i = 1:ExpInfo.numReps
     ExpInfo.AVpairs_order = [ExpInfo.AVpairs_order, randperm(ExpInfo.numAVpairs)];
 end
-% For ExpInfo.trialCondition, 1st row: A centroid idx; 2nd row: V centroid
-% idx; 3rd row: corr val (use ExpInfo.AVpairs_order to find corresponding
-% disc & corr for each trial
-ExpInfo.trialConditions = NaN(3,ExpInfo.numTotalTrials);
+% For ExpInfo.trialConditions, 1st row: A centroid idx; 2nd row: V centroid
+% idx; 3rd row: disc level; 4th row: corr val (use ExpInfo.AVpairs_order to find 
+% corresponding disc & corr for each trial
+ExpInfo.trialConditions = NaN(4,ExpInfo.numTotalTrials);
 for i = 1:ExpInfo.numTotalTrials
-    AVpairIdx_temp = ExpInfo.AVpairs_allComb(:,i);
+    AVpairIdx_temp = ExpInfo.AVpairs_allComb(:,ExpInfo.AVpairs_order(i));
     disc_temp = AVpairIdx_temp(1); %disc idx
     corr_temp = AVpairIdx_temp(2); %corr idx
     [ridx,cidx] = find(AVcentroids_allCombsIdx(3,:)==ExpInfo.disc(disc_temp)); 
     %cidx stores the col idx of the AV pairs (A&V centroid idx) with that disc level 
-    ExpInfo.trialCondition(1:2,i) = AVcentroids_allCombsIdx(1:2,randsample(cidx,1));
-    ExpInfo.trialConditions(3,i) = ExpInfo.corrVals(corr_temp);
+    ExpInfo.trialConditions(1:2,i) = AVcentroids_allCombsIdx(1:2,randsample(cidx,1));
+    ExpInfo.trialConditions(3,i) = ExpInfo.disc(disc_temp);
+    ExpInfo.trialConditions(4,i) = ExpInfo.corrVals(corr_temp);
 end
-    
-% HERE!!!!!
-
-% For loc task, shuffle trial types (if 1: localize A; if 2: localize V)
-ExpInfo.order_VSnAS     = [];
-for i = 1:ExpInfo.numTotalTrials
-    ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
-end
-
-% Initialize data matrices for loc and unity 
-
-
-rand_indicesA = []; %stores centroid indices 
-for i = 1:ExpInfo.numTrialsPerLoc; rand_indicesA = [rand_indicesA, randperm(6)]; end
-rand_indicesV = [];
-for i = 1:ExpInfo.numTrialsPerLoc; rand_indicesV = [rand_indicesV, randperm(6)]; end
-
-ExpInfo.trialConditions = NaN(2,AudInfo.numTotalTrialsA+VSinfo.numTotalTrialsV);
-ExpInfo.trialConditions(1,ExpInfo.order_VSnAS==1) = ExpInfo.centroids(rand_indicesA); 
-ExpInfo.trialConditions(1,ExpInfo.order_VSnAS==2) = ExpInfo.centroids(rand_indicesV);
-ExpInfo.trialConditions(2,ExpInfo.order_VSnAS==1) = rand_indicesA; 
-ExpInfo.trialConditions(2,ExpInfo.order_VSnAS==2) = rand_indicesV;
 
 % define blocks and break trials
 ExpInfo.numBlocks         = 4;
-blocks                    = linspace(0,AudInfo.numTotalTrialsA+VSinfo.numTotalTrialsV,...
-                            ExpInfo.numBlocks+1); 
+blocks                    = linspace(0,ExpInfo.numTotalTrials,ExpInfo.numBlocks+1); 
 % split all the trials into 4 blocks
 ExpInfo.breakTrials       = floor(blocks(2:(end-1)));
 ExpInfo.numTrialsPerBlock = ExpInfo.breakTrials(1);
 
+% Tasks
+% For loc task, shuffle trial types (if 1: localize A; if 2: localize V)
+ExpInfo.order_VSnAS     = [];
+for i = 1:ExpInfo.numTotalTrials/2
+    ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
+end
+ExpInfo.bool_unityReport  = ones(1,ExpInfo.numTotalTrials); %1: insert unity judgment
+ExpInfo.randSampleAVtrain = cell(2,ExpInfo.numTotalTrials); %this stores randomly drawn A/V sequences 
+% 1st row: A; 2nd row: V
 
-%initialize a structure that stores all the responses and response time
-[Response.localization, Response.RT1, Response.unity, Response.RT2] = ...
-    deal(NaN(1,ExpInfo.numTotalTrials));  
-  
+% Initialize a structure that stores all the responses and response time
+Response.trialConditions = ExpInfo.trialConditions;
+Response.AVtrains = ExpInfo.randSampleAVtrain;
+Response.AVlocTrialOrder = ExpInfo.order_VSnAS;
+[Response.trialConditions, Response.localization, Response.RT1, Response.unity, Response.RT2] = ...
+    deal(NaN(1,ExpInfo.numTotalTrials)); 
+
 
 %% Run the experiment by calling the function PresentAVtrains
 % start the experiment
+HideCursor;
+Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
+                [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
 DrawFormattedText(windowPtr, 'Press any button to start the bimodal localization task.',...
     'center',ScreenInfo.yaxis-ScreenInfo.liftingYaxis,[255 255 255]);
 Screen('Flip',windowPtr);
 KbWait(-3); WaitSecs(1);
+Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
+                [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
 Screen('Flip',windowPtr);
 
 for ii = 1:ExpInfo.numTotalTrials % one trial is one AV train (5 events)
+    Acolidx   = ExpInfo.trialConditions(1,ii); %A centroid idx
+    Vcolidx   = ExpInfo.trialConditions(2,ii); %V centroid idx
+    corr_temp = ExpInfo.trialConditions(4,ii); %corr val of ii trial, updated each trial
+    %randomly sample one sequence from the corresponding cols of
+    %ExpInfo.Atrain and ExpInfo.Vtrain
+    ridx_corr = find(ExpInfo.orderedCorr > corr_temp-1e-5 &...
+        ExpInfo.orderedCorr < corr_temp+1e-5); %find the idx of ExpInfo.orderedCorr == corr_temp
+    % we will use this idx to locate A/V sequences with this particular
+    % corr val. ridx_corr should be 600*1, then randsample one from these
+    Arowidx   = randsample(ridx_corr,1);
+    Vrowidx   = Arowidx;
+    ExpInfo.randSampleAVtrain(1,ii) = ExpInfo.Atrain(Arowidx,Acolidx); 
+    ExpInfo.randSampleAVtrain(2,ii) = ExpInfo.Vtrain(Vrowidx,Vcolidx);
+    
     %present multisensory stimuli
-        [Response.localization(ii), Response.RT1(ii), Response.unity(ii),...
-        Response.RT2(ii)] = PresentAVtrains(ii,ExpInfo,ScreenInfo,...
-        VSinfo, AudInfo,pahandle,windowPtr);   
+    [Response.localization(ii), Response.RT1(ii), Response.unity(ii),...
+    Response.RT2(ii)] = PresentAVtrains(ii,ExpInfo,ScreenInfo,...
+    VSinfo, AudInfo,Arduino,pahandle,windowPtr);   
+
+    %add breaks     
+    if ismember(i,ExpInfo.breakTrials)
+        Screen('TextSize', windowPtr, 35);
+        Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
+                [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
+        DrawFormattedText(windowPtr, 'You''ve finished one block. Please take a break.',...
+            'center',ScreenInfo.yaxis-ScreenInfo.liftingYaxis-30,...
+            [255 255 255]);
+        DrawFormattedText(windowPtr, 'Press any button to resume the experiment.',...
+            'center',ScreenInfo.yaxis-ScreenInfo.liftingYaxis,...
+            [255 255 255]);
+        Screen('Flip',windowPtr); KbWait(-3); WaitSecs(1);
+        Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
+                [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
+        Screen('Flip',windowPtr); WaitSecs(0.5);
+    end 
+    
+    Bimodal_localization_data = {ExpInfo, ScreenInfo, VSinfo, AudInfo, Response};
+    save(out1FileName,'Bimodal_localization_data');
+    
 end
 
-%%
+%% Delete Arduino
 fclose(Arduino);
-delete(Arduino);
+delete(Arduino)
+ShowCursor;
+
+%% Save data and end the experiment
+Bimodal_localization_data = {ExpInfo, ScreenInfo, VSinfo, AudInfo, Response};
+save(out1FileName,'Bimodal_localization_data');
+Screen('CloseAll');

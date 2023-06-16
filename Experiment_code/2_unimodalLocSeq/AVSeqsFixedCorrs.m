@@ -43,7 +43,7 @@ end
 Atrain_temp         = reshape(CorrSortedA, [], 1); %600*1
 Vtrain_temp         = reshape(CorrSortedV, [], 1); %600*1
 disc                = (4:5:29)-3; %discrepancies
-ExpInfo.centroids   = [4,9,14,19,24,29];
+ExpInfo.centroids   = [4,9,14,19,24,29]; %location numbers, not actual dvg
 ExpInfo.Atrain      = repmat(Atrain_temp,[1,6]); 
 ExpInfo.Vtrain      = repmat(Vtrain_temp,[1,6]);
 for i = 1:6
@@ -58,13 +58,13 @@ end
 %Rows contain 600 different sequences with the same centroid (randomly draw 
 %from these sequences during the experiment)
 
-CorrAV_ordered = NaN(600,6); %check corr
-for i = 1:6
-    for j = 1:600
-      CorrAV_ordered(j,i) = corr(ExpInfo.Atrain{j,i}',ExpInfo.Vtrain{j,i}');
-    end
+CorrAV_ordered = NaN(600,1); %check corr
+for j = 1:600
+  CorrAV_ordered(j) = corr(ExpInfo.Atrain{j,1}',ExpInfo.Vtrain{j,1}');
 end
+
 
 %% save files
 AVseqsFixedCorrs = {ExpInfo.Atrain,ExpInfo.Vtrain,CorrAV_ordered};
 save('AVseqsFixedCorrs');
+

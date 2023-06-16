@@ -16,9 +16,9 @@ while isempty(ExpInfo.subjID) == 1
 end
 
 %load the AV sequences with fixed correlations 
-D = load('generatedAVseqs.mat');
-ExpInfo.Atrain = D.generatedAVseqs{1,1};
-ExpInfo.Vtrain = D.generatedAVseqs{1,2};
+D = load('AVseqsFixedCorrs.mat');
+ExpInfo.Atrain = D.AVseqsFixedCorrs{1,1};
+ExpInfo.Vtrain = D.AVseqsFixedCorrs{1,2};
 out1FileName   = ['UnimodalLocSeq_sub', num2str(ExpInfo.subjID)];
 
 %% Screen Setup 
@@ -182,7 +182,7 @@ Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
 Screen('Flip',windowPtr);
 
 for i = 1:(AudInfo.numTotalTrialsA+VSinfo.numTotalTrialsV) 
-    colidx = ExpInfo.trialConditions(2,i);
+    colidx = ExpInfo.trialConditions(2,i); %centroid idx
     if ExpInfo.order_VSnAS(i) == 1 %auditory trial
         jj = sum(ExpInfo.order_VSnAS(1:i)==1);
         %randomly sample one sequence from the corresponding col of ExpInfo.Atrain
