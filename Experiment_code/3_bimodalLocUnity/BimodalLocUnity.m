@@ -38,7 +38,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 screens = Screen('Screens');
 screenNumber = max(screens);
 black = BlackIndex(screenNumber);
-opacity = 0.7;
+opacity = 0.8;
 PsychDebugWindowConfiguration([], opacity)
 [windowPtr, rect] = PsychImaging('OpenWindow', screenNumber, black);
 % ------------------------------------------------------------
@@ -72,7 +72,7 @@ ScreenInfo.y2_lb = ScreenInfo.yaxis-ScreenInfo.liftingYaxis-7;
 ScreenInfo.y2_ub = ScreenInfo.yaxis-ScreenInfo.liftingYaxis+7;
 
 %% Initialise serial object
-Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',9600); 
+Arduino = serial('/dev/cu.usbmodemFD131','BaudRate',115200); 
 % open for usage
 fopen(Arduino);
 
@@ -133,7 +133,7 @@ ExpInfo.corrVals                     = -1:0.5:1;
 ExpInfo.numCorr                      = length(ExpInfo.corrVals);
 ExpInfo.disc                         = [-20 -10 0 10 20];
 ExpInfo.numDisc                      = length(ExpInfo.disc);
-ExpInfo.numReps                      = 40; %2 for practice, 40 for the real experiment 
+ExpInfo.numReps                      = 1; %2 for practice, 40 for the real experiment 
 ExpInfo.AVpairs_allComb              = combvec(1:ExpInfo.numCorr, 1:ExpInfo.numDisc);
 % 2*25, 1st row = 5 disc levels, 2nd row = 5 correlations
 ExpInfo.numAVpairs                   = size(ExpInfo.AVpairs_allComb, 2);
@@ -272,7 +272,6 @@ end
 %% Delete Arduino
 fclose(Arduino);
 delete(Arduino)
-ShowCursor;
 
 %% Save data and end the experiment
 Bimodal_localization_data = {ExpInfo, ScreenInfo, VSinfo, AudInfo, Response};
