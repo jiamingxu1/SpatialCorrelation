@@ -1,0 +1,1 @@
+% This script analyzes pointing data

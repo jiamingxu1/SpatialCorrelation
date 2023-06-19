@@ -20,7 +20,7 @@ end
 D = load('AVseqsFixedCorrs.mat');
 ExpInfo.Atrain = D.AVseqsFixedCorrs{1,1};
 ExpInfo.Vtrain = D.AVseqsFixedCorrs{1,2};
-out1FileName   = ['UnimodalLocSeq_sub', num2str(ExpInfo.subjID)];
+out1FileName   = ['UnimodalLocSeq_practice_sub', num2str(ExpInfo.subjID)];
 
 %% Screen Setup 
 Screen('Preference', 'VisualDebugLevel', 1);
@@ -114,7 +114,7 @@ ExpInfo.stimLocs                     = linspace(-30,30,31); %in deg
 ExpInfo.numLocs                      = length(ExpInfo.stimLocs);
 ExpInfo.centroids                    = ExpInfo.stimLocs([4,9,14,19,24,29]);
 ExpInfo.numCentroids                 = 6;
-ExpInfo.numTrialsPerLoc              = 40; %2 for practice, 60 for the real experiment
+ExpInfo.numTrialsPerLoc              = 2; %1 for practice, 60 for the real experiment
 AudInfo.numTotalTrialsA              = ExpInfo.numTrialsPerLoc * ExpInfo.numCentroids;
 VSinfo.numTotalTrialsV               = ExpInfo.numTrialsPerLoc * ExpInfo.numCentroids;
                                   
@@ -135,14 +135,6 @@ ExpInfo.trialConditions(1,ExpInfo.order_VSnAS==1) = ExpInfo.centroids(rand_indic
 ExpInfo.trialConditions(1,ExpInfo.order_VSnAS==2) = ExpInfo.centroids(rand_indicesV);
 ExpInfo.trialConditions(2,ExpInfo.order_VSnAS==1) = rand_indicesA; 
 ExpInfo.trialConditions(2,ExpInfo.order_VSnAS==2) = rand_indicesV;
-
-% define blocks and break trials
-ExpInfo.numBlocks         = 4;
-blocks                    = linspace(0,AudInfo.numTotalTrialsA+VSinfo.numTotalTrialsV,...
-                            ExpInfo.numBlocks+1); 
-% split all the trials into 4 blocks
-ExpInfo.breakTrials       = floor(blocks(2:(end-1)));
-ExpInfo.numTrialsPerBlock = ExpInfo.breakTrials(1);
 
 %% Initialize data matrices
 % Auditory data
@@ -199,33 +191,15 @@ for i = 1:(AudInfo.numTotalTrialsA+VSinfo.numTotalTrialsV)
             ii,ExpInfo,ScreenInfo,VSinfo,windowPtr);
     end
 
-    %add breaks     
-    if ismember(i,ExpInfo.breakTrials)
-        % black screen
-        Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
-                [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
-        DrawFormattedText(windowPtr, 'You''ve finished one block. Please take a break.',...
-            'center',ScreenInfo.yaxis-ScreenInfo.liftingYaxis-30,...
-            [255 255 255]);
-        DrawFormattedText(windowPtr, 'Press any button to resume the experiment.',...
-            'center',ScreenInfo.yaxis-ScreenInfo.liftingYaxis,...
-            [255 255 255]);
-        Screen('Flip',windowPtr); KbWait(-3); WaitSecs(1);
-        Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
-                [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
-        Screen('Flip',windowPtr); WaitSecs(0.5);
-    end
-
-    Unimodal_localization_data = {ExpInfo,ScreenInfo,VSinfo,AudInfo};
-    save(out1FileName,'Unimodal_localization_data');
+    Unimodal_localization_practice_data = {ExpInfo,ScreenInfo,VSinfo,AudInfo};
+    save(out1FileName,'Unimodal_localization_practice_data');
 end
 
 %% Delete Arduino
 fclose(Arduino);
 delete(Arduino)
-ShowCursor;
 
 %% Save data and end the experiment
-Unimodal_localization_data = {ExpInfo,ScreenInfo,VSinfo,AudInfo};
-save(out1FileName,'Unimodal_localization_data');
-Screen('CloseAll');
+Unimodal_localization_practice_data = {ExpInfo,ScreenInfo,VSinfo,AudInfo};
+save(out1FileName,'Unimodal_localization_practice_data');
+Screen('CloseAll'); ShowCursor;

@@ -52,11 +52,11 @@ function [Response_deg, RT] = PresentVisualTrain(~,VTrialNum,ExpInfo,...
          
     end
     
-    % black screen for 0.5 seconds
+    % black screen for 0.1 seconds
     Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
     Screen('Flip',windowPtr);
-    WaitSecs(0.5);
+    WaitSecs(0.1);
     
     %----------------------------------------------------------------------
     %--------------Record response using the pointing device---------------
@@ -72,6 +72,7 @@ function [Response_deg, RT] = PresentVisualTrain(~,VTrialNum,ExpInfo,...
         Screen('FillPoly', windowPtr, [0 300 0],[x-3 yLoc-12; x yLoc; x+3 yLoc-12]);
         Screen('Flip',windowPtr,0,0);
     end
+    HideCursor;
     Response_pixel = x;
     Response_cm    = (Response_pixel -  ScreenInfo.xmid)/ScreenInfo.numPixels_perCM;
     Response_deg   = rad2deg(atan(Response_cm/ExpInfo.sittingDistance));
@@ -80,7 +81,7 @@ function [Response_deg, RT] = PresentVisualTrain(~,VTrialNum,ExpInfo,...
     Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
     Screen('Flip',windowPtr);
-    WaitSecs(0.5);
+    WaitSecs(0.5); HideCursor;
  
 end
     

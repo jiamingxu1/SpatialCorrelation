@@ -8,7 +8,7 @@
 %% Enter subject's name
 clear all; close all; clc; rng('shuffle');
 addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
-
+HideCursor;
 ExpInfo.subjID = [];
 while isempty(ExpInfo.subjID) == 1
     try ExpInfo.subjID = input('Please enter participant ID#: '); %'s'
@@ -76,6 +76,7 @@ WaitSecs(1);
 Screen('Flip',windowPtr);
 
 for i = 1:ExpInfo.numTrials 
+    HideCursor;
     Screen('DrawTexture',windowPtr, ScreenInfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
     Screen('FillRect', windowPtr,[255 255 255], [ScreenInfo.xmid-7 ...
@@ -101,9 +102,8 @@ for i = 1:ExpInfo.numTrials
     PointingTest_practice_data = {ExpInfo,ScreenInfo, data};
     save(out1FileName,'PointingTest_practice_data');
 end
-ShowCursor;
 
 %% Save data and end the experiment
 PointingTest_practice_data = {ExpInfo,ScreenInfo, data};
 save(out1FileName,'PointingTest_practice_data');
-Screen('CloseAll');
+Screen('CloseAll');ShowCursor;

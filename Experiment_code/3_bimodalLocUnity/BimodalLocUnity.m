@@ -7,6 +7,7 @@
 %% Enter subject's name, setup screen 
 clear all; close all; clc; rng('shuffle');
 addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
+HideCursor;
 
 ExpInfo.subjID = [];
 while isempty(ExpInfo.subjID) == 1
@@ -23,13 +24,15 @@ while isempty(ExpInfo.session) == 1
     end
 end
 
+
 %load the AV sequences with fixed correlations 0
 addpath(genpath('/e/3.3/p3/hong/Desktop/GitHub/SpatialCorrelation/Experiment_code/2_unimodalLocSeq'));
 D = load('AVseqsFixedCorrs.mat');
 ExpInfo.Atrain      = D.AVseqsFixedCorrs{1,1};
 ExpInfo.Vtrain      = D.AVseqsFixedCorrs{1,2};
 ExpInfo.orderedCorr = D.AVseqsFixedCorrs{1,3};
-out1FileName        = ['BimodalLocSeq_sub', num2str(ExpInfo.subjID)];
+out1FileName        = ['BimodalLocSeq_sub', num2str(ExpInfo.subjID),...
+                       '_session', num2str(ExpInfo.session)];
 
 %% Screen Setup 
 Screen('Preference', 'VisualDebugLevel', 1);
@@ -38,7 +41,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 screens = Screen('Screens');
 screenNumber = max(screens);
 black = BlackIndex(screenNumber);
-opacity = 0.8;
+opacity = 1;
 PsychDebugWindowConfiguration([], opacity)
 [windowPtr, rect] = PsychImaging('OpenWindow', screenNumber, black);
 % ------------------------------------------------------------
@@ -133,7 +136,7 @@ ExpInfo.corrVals                     = -1:0.5:1;
 ExpInfo.numCorr                      = length(ExpInfo.corrVals);
 ExpInfo.disc                         = [-20 -10 0 10 20];
 ExpInfo.numDisc                      = length(ExpInfo.disc);
-ExpInfo.numReps                      = 1; %2 for practice, 40 for the real experiment 
+ExpInfo.numReps                      = 1; %1 for practice, 20 for the real experiment(20*2 sessions = 40 reps in total) 
 ExpInfo.AVpairs_allComb              = combvec(1:ExpInfo.numCorr, 1:ExpInfo.numDisc);
 % 2*25, 1st row = 5 disc levels, 2nd row = 5 correlations
 ExpInfo.numAVpairs                   = size(ExpInfo.AVpairs_allComb, 2);
@@ -199,18 +202,25 @@ ExpInfo.numTrialsPerBlock = ExpInfo.breakTrials(1);
 % Tasks
 % For loc task, shuffle trial types (if 1: localize A; if 2: localize V)
 ExpInfo.order_VSnAS     = [];
-for i = 1:ExpInfo.numTotalTrials/2
-    ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
+if ExpInfo.numReps == 1
+    for i = 1:ExpInfo.numTotalTrials/2
+        ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
+    end
+    ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS,1];
+else
+    for i = 1:ExpInfo.numTotalTrials/2
+        ExpInfo.order_VSnAS = [ExpInfo.order_VSnAS, randperm(2,2)]; 
+    end
 end
 ExpInfo.bool_unityReport  = ones(1,ExpInfo.numTotalTrials); %1: insert unity judgment
 ExpInfo.randSampleAVtrain = cell(2,ExpInfo.numTotalTrials); %this stores randomly drawn A/V sequences 
 % 1st row: A; 2nd row: V
 
 % Initialize a structure that stores all the responses and response time
-Response.trialConditions = ExpInfo.trialConditions;
-Response.AVtrains = ExpInfo.randSampleAVtrain;
+Response.trialConditions = NaN(4,size(ExpInfo.trialConditions,2));
+Response.AVseqs = NaN(2,length(ExpInfo.randSampleAVtrain));
 Response.AVlocTrialOrder = ExpInfo.order_VSnAS;
-[Response.trialConditions, Response.localization, Response.RT1, Response.unity, Response.RT2] = ...
+[Response.trialConditions, Response.AVseqs, Response.localization, Response.RT1, Response.unity, Response.RT2] = ...
     deal(NaN(1,ExpInfo.numTotalTrials)); 
 
 
@@ -248,7 +258,7 @@ for ii = 1:ExpInfo.numTotalTrials % one trial is one AV train (5 events)
     VSinfo, AudInfo,Arduino,pahandle,windowPtr);   
 
     %add breaks     
-    if ismember(i,ExpInfo.breakTrials)
+    if ismember(ii,ExpInfo.breakTrials)
         Screen('TextSize', windowPtr, 35);
         Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
@@ -263,7 +273,8 @@ for ii = 1:ExpInfo.numTotalTrials % one trial is one AV train (5 events)
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
         Screen('Flip',windowPtr); WaitSecs(0.5);
     end 
-    
+    Response.AVseqs = ExpInfo.randSampleAVtrain;
+    Response.trialConditions = ExpInfo.trialConditions;
     Bimodal_localization_data = {ExpInfo, ScreenInfo, VSinfo, AudInfo, Response};
     save(out1FileName,'Bimodal_localization_data');
     
@@ -276,4 +287,4 @@ delete(Arduino)
 %% Save data and end the experiment
 Bimodal_localization_data = {ExpInfo, ScreenInfo, VSinfo, AudInfo, Response};
 save(out1FileName,'Bimodal_localization_data');
-Screen('CloseAll');
+Screen('CloseAll'); ShowCursor;

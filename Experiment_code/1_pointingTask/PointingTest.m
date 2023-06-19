@@ -9,7 +9,7 @@
 clear all; close all; clc
 rng('shuffle');
 addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
-
+HideCursor;
 ExpInfo.subjID = [];
 while isempty(ExpInfo.subjID) == 1
     try ExpInfo.subjID = input('Please enter participant ID#: '); %'s'
@@ -25,7 +25,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 screens = Screen('Screens');
 screenNumber = max(screens);
 black = BlackIndex(screenNumber);
-opacity = 0.7;
+opacity = 1;
 PsychDebugWindowConfiguration([], opacity)
 [windowPtr, rect] = PsychImaging('OpenWindow', screenNumber, black);
 % ------------------------------------------------------------
@@ -75,7 +75,7 @@ Screen('Flip',windowPtr);
 KbWait(-3); %-1 if using the keyboard; -3 if using the attached keypad
 WaitSecs(1);
 Screen('Flip',windowPtr);
-
+HideCursor;
 for i = 1:ExpInfo.numTrials 
     Screen('DrawTexture',windowPtr, ScreenInfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
@@ -102,9 +102,9 @@ for i = 1:ExpInfo.numTrials
     PointingTest_data = {ExpInfo,ScreenInfo, data};
     save(out1FileName,'PointingTest_data');
 end
-ShowCursor;
+
 
 %% Save data and end the experiment
 PointingTest_data = {ExpInfo,ScreenInfo, data};
 save(out1FileName,'PointingTest_data');
-Screen('CloseAll');
+Screen('CloseAll'); ShowCursor;
