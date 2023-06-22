@@ -26,11 +26,13 @@ function [Response_deg, Response_pixel, RT] = PresentVisualStimulus(xLoc,...
     %----------------------------------------------------------------------
     %---------------------Display the visual feedback----------------------
     %----------------------------------------------------------------------
-    SetMouse(randi(ScreenInfo.xmid*2,1), yLoc, windowPtr);
+    SetMouse(randi(ScreenInfo.xmid*2,1), ScreenInfo.ymid*2, windowPtr);
     buttons = 0;
     tic
     while sum(buttons)==0
-        [x,~,buttons] = GetMouse; HideCursor;
+        [x,y,buttons] = GetMouse(windowPtr); HideCursor(windowPtr);
+        x = min(x, ScreenInfo.xmid*2); x = max(0,x);
+        y = ScreenInfo.ymid*2;
         Screen('DrawTexture',windowPtr, ScreenInfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
         Screen('FillRect', windowPtr, [0 300 0],[x-3 yLoc-24 x+3 yLoc-12]);

@@ -39,11 +39,11 @@ Screen('Preference', 'VisualDebugLevel', 1);
 Screen('Preference', 'SkipSyncTests', 1);
 % testing----------------------------------------------------
 screens = Screen('Screens');
-screenNumber = max(screens);
-black = BlackIndex(screenNumber);
+ScreenInfo.screenNumber = max(screens);
+black = BlackIndex(ScreenInfo.screenNumber);
 opacity = 1;
 PsychDebugWindowConfiguration([], opacity)
-[windowPtr, rect] = PsychImaging('OpenWindow', screenNumber, black);
+[windowPtr, rect] = PsychImaging('OpenWindow', ScreenInfo.screenNumber, black);
 % ------------------------------------------------------------
 % [windowPtr,rect] = Screen('OpenWindow', 0, [1,1,1]);
 % [windowPtr,rect] = Screen('OpenWindow', 0, [0,0,0],[100 100 1000 480]); % for testing
@@ -136,7 +136,7 @@ ExpInfo.corrVals                     = -1:0.5:1;
 ExpInfo.numCorr                      = length(ExpInfo.corrVals);
 ExpInfo.disc                         = [-20 -10 0 10 20];
 ExpInfo.numDisc                      = length(ExpInfo.disc);
-ExpInfo.numReps                      = 1; %1 for practice, 20 for the real experiment(20*2 sessions = 40 reps in total) 
+ExpInfo.numReps                      = 20; %1 for practice, 20 for the real experiment(20*2 sessions = 40 reps in total) 
 ExpInfo.AVpairs_allComb              = combvec(1:ExpInfo.numCorr, 1:ExpInfo.numDisc);
 % 2*25, 1st row = 5 disc levels, 2nd row = 5 correlations
 ExpInfo.numAVpairs                   = size(ExpInfo.AVpairs_allComb, 2);

@@ -50,7 +50,7 @@ ExpInfo.stimulusLocs_deg = -30:5:31;
 ExpInfo.sittingDistance  = 113.0; %the distance between the screen and participants
 ExpInfo.stimulusLocs_cm  = round(tan(deg2rad(ExpInfo.stimulusLocs_deg)).*...
                             ExpInfo.sittingDistance,1); %in cm 
-ExpInfo.numTrialsPerLoc  = 30;
+ExpInfo.numTrialsPerLoc  = 20;
 ExpInfo.numTrials        = ExpInfo.numTrialsPerLoc * length(ExpInfo.stimulusLocs_deg); 
 ExpInfo.numFrames_target = 6; %100ms
 

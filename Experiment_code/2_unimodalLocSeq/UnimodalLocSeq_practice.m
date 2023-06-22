@@ -29,7 +29,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 screens = Screen('Screens');
 screenNumber = max(screens);
 black = BlackIndex(screenNumber);
-opacity = 0.7;
+opacity = 1;
 PsychDebugWindowConfiguration([], opacity)
 [windowPtr, rect] = PsychImaging('OpenWindow', screenNumber, black);
 % ------------------------------------------------------------

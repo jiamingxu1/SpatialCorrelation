@@ -83,11 +83,14 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
     Screen('Flip',windowPtr); WaitSecs(0.5);
     yLoc = ScreenInfo.yaxis-ScreenInfo.liftingYaxis;
     Screen('TextSize', windowPtr, 12);
-    SetMouse(randi(ScreenInfo.xmid*2,1), yLoc, windowPtr); 
+    SetMouse(randi(ScreenInfo.xmid*2,1), ScreenInfo.ymid*2, windowPtr);
+    HideCursor(windowPtr);
     buttons = zeros(1,16); tic
     %localize the stimulus using a visual cursor
     while buttons(1) == 0
-        [x,~,buttons] = GetMouse; HideCursor;
+        [x,y,buttons] = GetMouse(windowPtr); HideCursor(windowPtr);
+        x = min(x, ScreenInfo.xmid*2); x = max(0,x);
+        y = ScreenInfo.ymid*2;
         Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
         if ExpInfo.order_VSnAS(TrialNum) == 1 %A trial
@@ -109,7 +112,7 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
         end
         
     end
-    HideCursor;
+    HideCursor(windowPtr);
     RT1            = toc;
     Response_pixel = x;
     Response_cm    = (Response_pixel - ScreenInfo.xmid)/ScreenInfo.numPixels_perCM;
@@ -117,7 +120,7 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
     Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
     Screen('Flip',windowPtr); WaitSecs(0.1);
-    HideCursor;
+    HideCursor(windowPtr);
     %Unity judgment
     if ExpInfo.bool_unityReport(TrialNum) == 1
         Screen('TextSize', windowPtr, 25);
@@ -132,7 +135,7 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
             %click left button: C=1; click right button: C=2
             [click,~,~,unity] = GetClicks;
         end
-        RT2     = toc; HideCursor;
+        RT2     = toc; HideCursor(windowPtr);
         %show a white frame to confirm the choice
         x_shift = ScreenInfo.x_box_unity(unity,:);
         Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
@@ -149,5 +152,5 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
     else
         unity = NaN; RT2 = NaN; 
     end
-    HideCursor;
+    HideCursor(windowPtr);
 end

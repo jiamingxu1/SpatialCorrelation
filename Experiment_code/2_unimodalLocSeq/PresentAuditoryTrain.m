@@ -62,10 +62,12 @@ function [Response_deg, RT]=PresentAuditoryTrain(~,ATrialNum,ExpInfo,...
     %--------------Record response using the pointing device---------------
     %---------------------------------------------------------------------- 
     yLoc = ScreenInfo.yaxis-ScreenInfo.liftingYaxis;
-    SetMouse(randi(ScreenInfo.xmid*2,1), yLoc, windowPtr); buttons = 0;
+    SetMouse(randi(ScreenInfo.xmid*2,1), ScreenInfo.ymid*2, windowPtr);
+    buttons = 0;
     tic
     while sum(buttons)==0
-        [x,~,buttons] = GetMouse; HideCursor;
+        [x,~,buttons] = GetMouse(windowPtr); HideCursor;
+        x = min(x, ScreenInfo.xmid*2); x = max(0,x);
         Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
         Screen('FillRect', windowPtr, [0 300 0],[x-3 yLoc-24 x+3 yLoc-12]);
