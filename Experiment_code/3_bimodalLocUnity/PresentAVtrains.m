@@ -84,11 +84,11 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
     yLoc = ScreenInfo.yaxis-ScreenInfo.liftingYaxis;
     Screen('TextSize', windowPtr, 12);
     SetMouse(randi(ScreenInfo.xmid*2,1), ScreenInfo.ymid*2, windowPtr);
-    HideCursor(windowPtr);
+    HideCursor;
     buttons = zeros(1,16); tic
     %localize the stimulus using a visual cursor
     while buttons(1) == 0
-        [x,y,buttons] = GetMouse(windowPtr); HideCursor(windowPtr);
+        [x,y,buttons] = GetMouse(windowPtr); HideCursor;
         x = min(x, ScreenInfo.xmid*2); x = max(0,x);
         y = ScreenInfo.ymid*2;
         Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
@@ -112,7 +112,7 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
         end
         
     end
-    HideCursor(windowPtr);
+    HideCursor;
     RT1            = toc;
     Response_pixel = x;
     Response_cm    = (Response_pixel - ScreenInfo.xmid)/ScreenInfo.numPixels_perCM;
