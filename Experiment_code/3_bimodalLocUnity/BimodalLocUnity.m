@@ -136,11 +136,11 @@ ExpInfo.corrVals                     = -1:0.5:1;
 ExpInfo.numCorr                      = length(ExpInfo.corrVals);
 ExpInfo.disc                         = [-20 -10 0 10 20];
 ExpInfo.numDisc                      = length(ExpInfo.disc);
-ExpInfo.numReps                      = 20; %1 for practice, 20 for the real experiment(20*2 sessions = 40 reps in total) 
+ExpInfo.numReps                      = 16; %1 for practice, 16 for the real experiment(16*2 sessions = 32 reps in total) 
 ExpInfo.AVpairs_allComb              = combvec(1:ExpInfo.numCorr, 1:ExpInfo.numDisc);
 % 2*25, 1st row = 5 disc levels, 2nd row = 5 correlations
 ExpInfo.numAVpairs                   = size(ExpInfo.AVpairs_allComb, 2);
-ExpInfo.numTotalTrials               = ExpInfo.numReps * ExpInfo.numAVpairs; %1000 trials
+ExpInfo.numTotalTrials               = ExpInfo.numReps * ExpInfo.numAVpairs; 
 
 % For each discrepancy level, shuffle A/V centroids 
 % A: [-24 -14 -4 6 16 26]
@@ -170,9 +170,9 @@ AVcentroids_allCombsIdx(3,:) = ExpInfo.AVcentroids_allCombs(3,:);
 % 3rd row: disc
 
 
-% Trial conditions for all 1000 trials (condition idx: 1-25, these are the column
+% Trial conditions for all 800 trials (condition idx: 1-25, these are the column
 % indeces of ExpInfo.AVpairs_allComb. Each col contains a disc idx and a corr idx)
-% For each block, each trial type is presented 250/25 = 10 times
+% For each block, each trial type is presented 200/25 = 8 times
 ExpInfo.AVpairs_order     = [];
 for i = 1:ExpInfo.numReps
     ExpInfo.AVpairs_order = [ExpInfo.AVpairs_order, randperm(ExpInfo.numAVpairs)];
