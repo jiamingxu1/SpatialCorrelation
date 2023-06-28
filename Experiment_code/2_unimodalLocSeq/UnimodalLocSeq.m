@@ -1,5 +1,6 @@
 %This script tests subjects' accuracy and precision in localizing the centroids
-% of visual and auditory trains stimuli. The visual stimulus is a train of
+% of visual and auditory trains stimuli. The visual stimulus i
+s a train of
 % 5 gaussian blobs appearing in 5 different locations. The auditory
 % stimulus is a train of 5 beeps appearing in 5 different locations. The
 % task is to localize the centroid of each train (V/A interleaved). 

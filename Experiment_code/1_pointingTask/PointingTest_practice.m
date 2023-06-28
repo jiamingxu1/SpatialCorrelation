@@ -1,7 +1,10 @@
+
 %This script let participants practice using the pointing
 %device. On each trial, they will be shown a target white dot for 100 ms 
 %then the target will disappear. Participants will be instructed to use
 %the pointing device and rotate it to the location of the target. Visual 
+
+
 %feedback will be provided. This practice just gives subjects an idea of 
 %how the pointing device works and also measures their motor and memory noise.
 
@@ -24,7 +27,7 @@ Screen('Preference', 'SkipSyncTests', 1);
 screens = Screen('Screens');
 screenNumber = max(screens);
 black = BlackIndex(screenNumber);
-opacity = 0.7;
+opacity = 1;
 PsychDebugWindowConfiguration([], opacity)
 [windowPtr, rect] = PsychImaging('OpenWindow', screenNumber, black);
 % ------------------------------------------------------------
@@ -106,4 +109,4 @@ end
 %% Save data and end the experiment
 PointingTest_practice_data = {ExpInfo,ScreenInfo, data};
 save(out1FileName,'PointingTest_practice_data');
-Screen('CloseAll');ShowCursor;
+Screen('CloseAll');

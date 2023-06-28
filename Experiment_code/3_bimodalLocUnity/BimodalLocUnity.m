@@ -30,6 +30,7 @@ addpath(genpath('/e/3.3/p3/hong/Desktop/GitHub/SpatialCorrelation/Experiment_cod
 D = load('AVseqsFixedCorrs.mat');
 ExpInfo.Atrain      = D.AVseqsFixedCorrs{1,1};
 ExpInfo.Vtrain      = D.AVseqsFixedCorrs{1,2};
+
 ExpInfo.orderedCorr = D.AVseqsFixedCorrs{1,3};
 out1FileName        = ['BimodalLocSeq_sub', num2str(ExpInfo.subjID),...
                        '_session', num2str(ExpInfo.session)];
