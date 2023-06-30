@@ -6,6 +6,7 @@
 
 %% Enter subject's name, setup screen 
 clear all; close all; clc; rng('shuffle');
+
 addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 HideCursor;
 
