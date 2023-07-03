@@ -1,8 +1,10 @@
 % This is the main experiment. We present A and V trains of 5 simultaneously,
 % with fixed, repetitive timing. We vary the spatial locations of A and V
 % within a spatial window of 5, such that the corr between AV trains range
-% from [-1,1]. The task is first localize the centroid of A or V, and then
+% from [-1,1]. The task is first localize the centroid of A
+or V, and then
 % report unity judgment. 
+
 
 %% Enter subject's name, setup screen 
 clear all; close all; clc; rng('shuffle');

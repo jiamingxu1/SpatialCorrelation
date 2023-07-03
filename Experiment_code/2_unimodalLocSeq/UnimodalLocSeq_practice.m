@@ -2,7 +2,8 @@
 % of visual and auditory trains stimuli. The visual stimulus is a train of
 % 5 gaussian blobs appearing in 5 different locations. The auditory
 % stimulus is a train of 5 beeps appearing in 5 different locations. The
-% task is to localize the centroid of each train (V/A interleaved). 
+% task is t
+o localize the centroid of each train (V/A interleaved). 
 
 %% Enter subject's name
 clear all; close all; clc; rng('shuffle');
