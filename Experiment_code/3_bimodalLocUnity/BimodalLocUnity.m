@@ -1,8 +1,7 @@
 % This is the main experiment. We present A and V trains of 5 simultaneously,
-% with fixed, repetitive timing. We vary the spatial locations of A and V
-% within a spatial window of 5, such that the corr between AV trains range
-% from [-1,1]. The task is first localize the centroid of A
-or V, and then
+% with fixed, repetitive timing. We the spatial locations of A and V
+% within a spatial window of 5, such that the corr0 between AV trains range
+% from [-1,1]. The task is first localize the centroid of A or V, and then
 % report unity judgment. 
 
 
@@ -13,9 +12,11 @@ addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 HideCursor;
 
 ExpInfo.subjID = [];
+
 while isempty(ExpInfo.subjID) == 1
     try ExpInfo.subjID = input('Please enter participant ID#: ') ; %'s'
     catch
+        
     end
 end
 
@@ -23,12 +24,14 @@ end
 ExpInfo.session = [];
 while isempty(ExpInfo.session) == 1
     try ExpInfo.session = input('Please enter the session#: ') ; %'s'
+        
+        
     catch
     end
 end
 
 
-%load the AV sequences with fixed correlations 0
+%load the AV sequences with fixed correlations 
 addpath(genpath('/e/3.3/p3/hong/Desktop/GitHub/SpatialCorrelation/Experiment_code/2_unimodalLocSeq'));
 D = load('AVseqsFixedCorrs.mat');
 ExpInfo.Atrain      = D.AVseqsFixedCorrs{1,1};
@@ -199,6 +202,7 @@ end
 % define blocks and break trials
 ExpInfo.numBlocks         = 4;
 blocks                    = linspace(0,ExpInfo.numTotalTrials,ExpInfo.numBlocks+1); 
+%% 
 % split all the trials into 4 blocks
 ExpInfo.breakTrials       = floor(blocks(2:(end-1)));
 ExpInfo.numTrialsPerBlock = ExpInfo.breakTrials(1);
@@ -231,11 +235,12 @@ Response.AVlocTrialOrder = ExpInfo.order_VSnAS;
 %% Run the experiment by calling the function PresentAVtrains
 % start the experiment
 HideCursor;
-Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
+Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],....
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
 DrawFormattedText(windowPtr, 'Press any button to start the bimodal localization task.',...
     'center',ScreenInfo.yaxis-ScreenInfo.liftingYaxis,[255 255 255]);
 Screen('Flip',windowPtr);
+
 KbWait(-3); WaitSecs(1);
 Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
