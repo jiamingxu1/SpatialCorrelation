@@ -3,8 +3,6 @@
 %device. On each trial, they will be shown a target white dot for 100 ms 
 %then the target will disappear. Participants will be instructed to use
 %the pointing device and rotate it to the location of the target. Visual 
-
-
 %feedback will be provided. This practice just gives subjects an idea of 
 %how the pointing device works and also measures their motor and memory noise.
 

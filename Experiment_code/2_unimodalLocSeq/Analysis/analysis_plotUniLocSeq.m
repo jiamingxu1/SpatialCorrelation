@@ -3,8 +3,8 @@
 clear all; close all; clc
 
 % load the data
-subjNum                  = 4;
-subjInitial              = 'ZGL';
+subjNum                  = 7;
+subjInitial              = 'YX';
 addpath(genpath(['/e/3.3/p3/hong/Desktop/GitHub/SpatialCorrelation/'...
     'Experiment_code/2_unimodalLocSeq/Analysis/',subjInitial,'/']));
 C                        = load(strcat('UnimodalLocSeq_sub', num2str(subjNum),'.mat'));

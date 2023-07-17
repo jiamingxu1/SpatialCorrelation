@@ -120,7 +120,7 @@ function [localization, RT1, unity, RT2] = PresentAVtrains(TrialNum,...
     Screen('DrawTexture',windowPtr, VSinfo.blk_texture,[],...
                 [0,0,ScreenInfo.xaxis, ScreenInfo.yaxis]);
     Screen('Flip',windowPtr); WaitSecs(0.1);
-    HideCursor(windowPtr);
+    HideCursor;
     %Unity judgment
     if ExpInfo.bool_unityReport(TrialNum) == 1
         Screen('TextSize', windowPtr, 25);

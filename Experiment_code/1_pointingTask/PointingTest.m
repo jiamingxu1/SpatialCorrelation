@@ -10,6 +10,7 @@ clear all; close all; clc
 rng('shuffle');
 addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
 HideCursor;
+
 ExpInfo.subjID = [];
 while isempty(ExpInfo.subjID) == 1
     try ExpInfo.subjID = input('Please enter participant ID#: '); %'s'

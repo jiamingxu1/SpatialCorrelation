@@ -202,4 +202,4 @@ delete(Arduino)
 %% Save data and end the experiment
 Unimodal_localization_practice_data = {ExpInfo,ScreenInfo,VSinfo,AudInfo};
 save(out1FileName,'Unimodal_localization_practice_data');
-Screen('CloseAll'); ShowCursor;
+Screen('CloseAll'); 

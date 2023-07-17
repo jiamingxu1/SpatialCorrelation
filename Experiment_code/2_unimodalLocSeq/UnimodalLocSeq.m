@@ -1,13 +1,14 @@
-%This script tests subjects' accuracy and precision in localizing the centroids
-% of visual and auditory trains stimuli. The visual stimulus i
-s a train of
+%This script tests subjects' accu
+
+racy and precision in localizing the centroids
+% of visual and auditory trains stimuli. The visual stimulus is a train of
 % 5 gaussian blobs appearing in 5 different locations. The auditory
 % stimulus is a train of 5 beeps appearing in 5 different locations. The
 % task is to localize the centroid of each train (V/A interleaved). 
 
 %% Enter subject's name
 clear all; close all; clc; rng('shuffle');
-addpath(genpath('/e/3.3/p3/hong/Desktop/Project5/Psychtoolbox'));
+addpath(genpath('/e/3.3/p3/hong/Desktop3/Project5/Psychtoolbox'));
 HideCursor;
 
 ExpInfo.subjID = [];
@@ -224,7 +225,6 @@ end
 %% Delete Arduino
 fclose(Arduino);
 delete(Arduino)
-ShowCursor;
 
 %% Save data and end the experiment
 Unimodal_localization_data = {ExpInfo,ScreenInfo,VSinfo,AudInfo};
