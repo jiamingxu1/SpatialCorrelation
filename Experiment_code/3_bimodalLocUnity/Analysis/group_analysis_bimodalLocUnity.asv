@@ -48,18 +48,18 @@ nTT         = lenS*lenD*lenCorr*numReps;
 VE_ujdg_ind = cell(length(subjN),1); % pre-allocate
 for i = 1:length(subjN)
     if i == 1 || i == 2
-        VE_ujdg_ind{i} = NaN(1000,10);
+        VE_ujdg_ind{i} = NaN(1000,8);
     else
-        VE_ujdg_ind{i} = NaN(800,10);
+        VE_ujdg_ind{i} = NaN(800,7);
     end
 end 
 
 sessionData = cell(1, 2); % 2 sessions per subject, this gets updated for each i loop
 for i = 1:length(subjN)
     if i == 1 || i == 2
-        sessionData(:) = {NaN(500, 10)};
+        sessionData(:) = {NaN(1000, 8)};
     else
-        sessionData(:) = {NaN(400, 10)};
+        sessionData(:) = {NaN(800, 8)};
     end
     
     for j = 1:2
@@ -77,17 +77,39 @@ for i = 1:length(subjN)
         sessionData{j}(:,8) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...
                                   .AVlocTrialOrder; % modality 1=A; 2=V 
         sessionData{j}(:,9) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...
-                                  .localization; % localization responses
-        sessionData{j}(:,10) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...
-                                  .unity; % unity responses
+                                  .localization; % localizati
+        
+
+
+
     end
-    VE_ujdg_ind{i} = cat(1,sessionData{1},sessionData{2});
 end
 
-% group-level
-VE_ujdg_group = cat(1,VE_ujdg_ind{1:9});
 
 
+%% load experiment information
+ExpInfo     = C.Bimodal_localization_data{1,1};
+sessions    = [1 2];
+lenS        = length(sessions);
+modality    = {'A','V'};
+lenM        = length(modality);
+disc_levels = ExpInfo.disc;
+lenD        = length(disc_levels);
+centroids   = ExpInfo.centroids;
+lenCent     = length(centroids);
+corr_levels = ExpInfo.corrVals;
+lenCorr     = length(corr_levels);
+numReps     = ExpInfo.numReps;
+nTT         = lenS*lenD*lenCorr*numReps; % 5*5 = 25 different AV pairs, each pair was repeated 40 times
 
+Acentroid = [ExpInfo.centroids(Acentroid_idx(1,:)) ExpInfo.centroids(Acentroid_idx(2,:))];
+Vcentroid = [ExpInfo.centroids(Vcentroid_idx(1,:)) ExpInfo.centroids(Vcentroid_idx(2,:))];
+disc      = [disc_temp(1,:) disc_temp(2,:)];
+corr      = [corr_temp(1,:) corr_temp(2,:)];
+
+% re-organize data matrices
+locModality      = [locModality_temp(1,:) locModality_temp(2,:)];
+locResp          = [locResp_temp(1,:) locResp_temp(2,:)];
+unityResp        = [unityResp_temp(1,:) unityResp_temp(2,:)];
 
 
