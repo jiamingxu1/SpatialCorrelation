@@ -1,6 +1,4 @@
-%This script tests subjects' accu
-
-racy and precision in localizing the centroids
+%This script tests subjects' accuracy and precision in localizing the centroids
 % of visual and auditory trains stimuli. The visual stimulus is a train of
 % 5 gaussian blobs appearing in 5 different locations. The auditory
 % stimulus is a train of 5 beeps appearing in 5 different locations. The
@@ -116,7 +114,7 @@ ExpInfo.stimLocs                     = linspace(-30,30,31); %in deg
 ExpInfo.numLocs                      = length(ExpInfo.stimLocs);
 ExpInfo.centroids                    = ExpInfo.stimLocs([4,9,14,19,24,29]);
 ExpInfo.numCentroids                 = 6;
-ExpInfo.numTrialsPerLoc              = 40; %2 for practice, 60 for the real experiment
+ExpInfo.numTrialsPerLoc              = 40; %2 for practice, 40 for the real experiment
 AudInfo.numTotalTrialsA              = ExpInfo.numTrialsPerLoc * ExpInfo.numCentroids;
 VSinfo.numTotalTrialsV               = ExpInfo.numTrialsPerLoc * ExpInfo.numCentroids;
                                   

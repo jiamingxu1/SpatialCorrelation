@@ -3,8 +3,8 @@
 clear all; close all; clc
 
 % load the data
-subjNum                  = 7;
-subjInitial              = 'YX';
+subjNum                  = 5;
+subjInitial              = 'ZD';
 addpath(genpath(['/e/3.3/p3/hong/Desktop/GitHub/SpatialCorrelation/'...
     'Experiment_code/2_unimodalLocSeq/Analysis/',subjInitial,'/']));
 C                        = load(strcat('UnimodalLocSeq_sub', num2str(subjNum),'.mat'));
@@ -50,7 +50,7 @@ xlim([-30 30])
 ylim([min(AudInfo.data(2,:))-3 max(AudInfo.data(2,:))+3])
 xlabel('Actual auditory centroid locations (dvg)','FontSize', 12)
 ylabel('Localization responses (dvg)','FontSize', 12)
-title('Unimodal auditory sequence localization (sub2 subjInitial)','FontSize', 14)
+title('Unimodal auditory sequence localization (sub subjI)','FontSize', 14)
 
 % visual localization
 figure(2);
@@ -70,5 +70,5 @@ xlim([-30 30])
 ylim([min(VSinfo.data(3,:))-3 max(VSinfo.data(3,:))+3])
 xlabel('Actual visual centroid locations (dvg)','FontSize', 12)
 ylabel('Localization responses (dvg)','FontSize', 12)
-title('Unimodal visual sequence localization (sub2 JX)','FontSize', 14)
+title('Unimodal visual sequence localization (sub subjI)','FontSize', 14)
 
