@@ -1,4 +1,4 @@
-%% Group-level behavioral a for unity judgement and VE
+%% Group-level behavioral analyses for unity judgement and VE
 
 clear all; clc;
 subjN = [2,3,4,5,7,8,9,10,11];
@@ -51,12 +51,14 @@ for i = 1:length(subjN)
         VE_ujdg_ind{i} = NaN(1000,10);
     else
         VE_ujdg_ind{i} = NaN(800,10);
+       
     end
 end 
 
 sessionData = cell(1, 2); % 2 sessions per subject, this gets updated for each i loop
 for i = 1:length(subjN)
     if i == 1 || i == 2
+<<<<<<< HEAD
         sessionData(:) = {NaN(500, 10)};
     else
         sessionData(:) = {NaN(400, 10)};
@@ -65,6 +67,7 @@ for i = 1:length(subjN)
     for j = 1:2
         sessionData{j}(:,1) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,1}.subjID;
         sessionData{j}(:,2) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...
+<<<<<<< HEAD
                                   .trialConditions(1,:); % A centroid idx
         sessionData{j}(:,3) = centroids(sessionData{j}(:,2)); % A centroids
         sessionData{j}(:,4) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...

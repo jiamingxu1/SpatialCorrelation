@@ -150,6 +150,10 @@ set(gcf,'PaperUnits','centimeters','PaperSize',[50 25]);
 
 
 %% VE analyses 
+% group-level
+VE_ujdg_group = cat(1,VE_ujdg_ind{1:9});
+
+
 
 
 
