@@ -114,7 +114,7 @@ for i = 1:length(subjN)
         sessionData{j}(:,3) = centroids(sessionData{j}(:,2)); % A centroids
         sessionData{j}(:,4) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...
                                   .trialConditions(2,:); % V centroid idx
-        sessionData{j}(:,5) = centroids(sessionData{j}(:,2)); % V centroids
+        sessionData{j}(:,5) = centroids(sessionData{j}(:,4)); % V centroids
         sessionData{j}(:,6) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...
                                   .trialConditions(3,:); % disc
         sessionData{j}(:,7) = groupData(i).(sprintf('session%d',j)).Bimodal_localization_data{1,5}...
@@ -147,7 +147,7 @@ for i = 1:lenD
             else
                 numReps = 32;
             end
-            for k = 1:40
+            for k = 1:numReps
                 indices = find(VE_ujdg_group(:,1) == subjN(m)...
                     & VE_ujdg_group(:,6) == disc_levels(i)...
                     & VE_ujdg_group(:,7) == corr_levels(j));
@@ -321,16 +321,19 @@ end
 x_bds          = [disc_levels(1) - 2, disc_levels(end) + 2]; 
 y_bds          = [min(min(VE_audAvg))-5, max(max(VE_audAvg))+5];
 x_ticks_AVdiff = disc_levels; 
-y_ticks        = ceil(min(min(VE_audAvg))-5):5:ceil(max(max(VE_audAvg))+5);
+y_ticks        = -10:5:10; %ceil(min(min(VE_audAvg))-5):5:ceil(max(max(VE_audAvg))+5);
 lw             = 2.5; %lineWidth
 fs_lbls        = 20; %font size
 fs_lgds        = 15;
 cMap_VE     = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.9290 0.6940 0.1250;...
                   0.4940 0.1840 0.5560;0.4660 0.6740 0.1880];
 lgd_corr       = {'r = -1','r = -0.5','r = 0','r = 0.5','r = 1'};
-
+x = linspace(-26,26,26); y = zeros(size(x));
 
 figure(2)
+identity_line = plot(x, x,'k'); hold on
+horizontal_line = plot(x, y,'k--'); hold on
+
 for i = 1:lenCorr
     fig2(i) = plot(disc_levels, VE_audAvg(:,i), '-o',...
         'MarkerSize',6,'Color',cMap_VE(i,:),...
@@ -341,14 +344,14 @@ end
 %add legends 
 legend([fig2(1) fig2(2) fig2(3) fig2(4) fig2(5)], lgd_corr,...
     'FontSize',fs_lgds); legend boxoff;
-xticks(x_ticks_AVdiff); xlim(x_bds); xlabel('Spatial discrepancy (V - A, deg)'); 
+xticks(x_ticks_AVdiff); xlim(x_bds); xlabel('Spatial discrepancy (A - V, deg)'); 
 ylabel(sprintf('Auditory ventriloquism effect')); 
 title('Auditory ventrilquism effect as a function of spatial discrepancy and correlation');
 yticks(y_ticks);ylim(y_bds);
 set(gca,'FontSize',fs_lbls);
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 0.75, 0.60]);
 set(gcf,'PaperUnits','centimeters','PaperSize',[50 25]);
-%     saveas(gcf, ['UnityJdg_btwPrePost_',subjI], 'pdf'); 
+% saveas(gcf, 'group_level_ujdg', 'pdf'); 
 
 
 
@@ -356,15 +359,19 @@ set(gcf,'PaperUnits','centimeters','PaperSize',[50 25]);
 x_bds          = [disc_levels(1) - 2, disc_levels(end) + 2]; 
 y_bds          = [min(min(VE_visAvg))-5, max(max(VE_visAvg))+5];
 x_ticks_AVdiff = disc_levels; 
-y_ticks        = ceil(min(min(VE_visAvg))-5):5:ceil(max(max(VE_visAvg))+5);
+y_ticks        = -10:5:10; %ceil(min(min(VE_audAvg))-5):5:ceil(max(max(VE_audAvg))+5);
 lw             = 2.5; %lineWidth
 fs_lbls        = 20; %font size
 fs_lgds        = 15;
 cMap_VE     = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.9290 0.6940 0.1250;...
                   0.4940 0.1840 0.5560;0.4660 0.6740 0.1880];
 lgd_corr       = {'r = -1','r = -0.5','r = 0','r = 0.5','r = 1'};
+x = linspace(-26,26,26); y = zeros(size(x));
 
 figure(3)
+identity_line = plot(x, x, 'k'); hold on
+horizontal_line = plot(x, y,'k--'); hold on
+
 for i = 1:lenCorr
     fig3(i) = plot(disc_levels, VE_visAvg(:,i), '-o',...
         'MarkerSize',6,'Color',cMap_VE(i,:),...
@@ -382,5 +389,5 @@ yticks(y_ticks);ylim(y_bds);
 set(gca,'FontSize',fs_lbls);
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 0.75, 0.60]);
 set(gcf,'PaperUnits','centimeters','PaperSize',[50 25]);
-%     saveas(gcf, ['UnityJdg_btwPrePost_',subjI], 'pdf'); 
+% saveas(gcf,'group_level_VE_', 'pdf'); 
 
