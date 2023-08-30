@@ -184,8 +184,11 @@ ExpInfo.AVpairs_order     = [];
 for i = 1:ExpInfo.numReps
     ExpInfo.AVpairs_order = [ExpInfo.AVpairs_order, randperm(ExpInfo.numAVpairs)];
 end
-% For ExpInfo.trialConditions, 1st row: A centroid idx; 2nd row: V centroid
-% idx; 3rd row: disc level; 4th row: corr val (use ExpInfo.AVpairs_order to find 
+% For ExpInfo.trialConditions, 
+% 1st row: A centroid idx; 
+% 2nd row: V centroid idx; 
+% 3rd row: disc level; 
+% 4th row: corr val (use ExpInfo.AVpairs_order to find 
 % corresponding disc & corr for each trial
 ExpInfo.trialConditions = NaN(4,ExpInfo.numTotalTrials);
 for i = 1:ExpInfo.numTotalTrials

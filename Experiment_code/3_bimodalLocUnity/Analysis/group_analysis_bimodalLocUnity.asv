@@ -12,12 +12,12 @@ end
 % initialize
 indData1 = struct('uniLoc',[]);
 groupData1 = repmat(indData1, length(subjN), 1);
-% expt info
+% useful expt info
 lenN        = length(subjN);
 centroids   = [-24 -14 -4 6 16 26];
 lenCent     = length(centroids);
 nP          = 40;
-% fetch data
+% load data
 for i = 1:lenN
     groupData1(i).uniLoc = load(['UnimodalLocSeq_sub', num2str(subjN(i)),'.mat']);
 end
@@ -65,7 +65,7 @@ for j = 1:length(subjN)
     '_session',num2str(2),'.mat']);
 end
 
-% load some experiment information
+% useful expt info
 sessions    = [1 2];
 lenS        = length(sessions);
 modality    = {'A','V'};
@@ -80,9 +80,9 @@ nTT         = lenS*lenD*lenCorr*numReps;
 % organize data into a big matrix 
 % 1. subjN            : subject ID
 % 2. A centroid idx   : A centroid idx
-% 3. A centroid       : A centroid location for a given trial (in deg)
+% 3. A centroid       : A centroid location 
 % 4. V centroid idx   : V centroid idx
-% 5. V centroid       : V centroid location for a given trial (in deg)
+% 5. V centroid       : V centroid location 
 % 6. disc             : discrepancy between the AV pair (V-A)
 % 7. corr             : correlation between the AV pair
 % 8. localizeModality : cued modality after stimulus presentation (1: A, 2, V)
@@ -131,47 +131,31 @@ end
 
 % group-level data 
 VE_ujdg_group = cat(1,VE_ujdg_ind{1:9});
-colNames = {'subjID','Acentroid_idx','Acentroids','Vcentroid_idx','Vcentroids,...' ...
+colNames = {'subjID','Acentroid_idx','Acentroids','Vcentroid_idx','Vcentroids' ...
     'disc','corr','modality','loc_resp','unity'};
 VE_ujdg_table = array2table(VE_ujdg_group, 'VariableNames', colNames);
 
 
 %% unity judgment analysis 
 
-trialidx = cell(lenD,lenCorr,lenN); 
+trialidx = cell(lenD,lenCorr,lenN); unityResp_reshaped = cell(lenD,lenCorr,lenN);
+PC1_resp = NaN(lenD,lenCorr,lenN); PC1_respAvg = NaN(lenD,lenCorr);
 for i = 1:lenD
     for j = 1:lenCorr
         for m = 1:lenN
-            if m == 1 || m == 2
-                numReps = 40;
-            else
-                numReps = 32;
-            end
+            if m == 1||m == 2; numReps = 40; else; numReps = 32; end
             for k = 1:numReps
                 indices = find(VE_ujdg_group(:,1) == subjN(m)...
                     & VE_ujdg_group(:,6) == disc_levels(i)...
                     & VE_ujdg_group(:,7) == corr_levels(j));
                 trialidx{i,j,m} = indices;
             end
-        end
-    end
-end
-
-unityResp_reshaped = cell(lenD,lenCorr,lenN);
-PC1_resp = NaN(lenD,lenCorr,lenN); PC1_respAvg = NaN(lenD,lenCorr);
-for i = 1:lenD
-    for j = 1:lenCorr
-        for m = 1:lenN
-            if m == 1 || m == 2
-                numReps = 40;
-            else
-                numReps = 32;
-            end
+            %subject level ujdg response for each disc x corr 
             for k = 1:numReps
-                unityResp = VE_ujdg_group(trialidx{i,j,m},10); %subject level ujdg response for each condition 
+                unityResp = VE_ujdg_group(trialidx{i,j,m},10); 
                 unityResp_reshaped{i,j,m} = unityResp;
                 PC1_resp(i,j,m) = sum(unityResp_reshaped{i,j,m} == 1)/numReps;
-            end   
+            end
             PC1_respAvg(i,j) = mean(PC1_resp(i,j,PC1_resp(i,j,:) ~= 0));
         end
     end
@@ -213,11 +197,17 @@ set(gcf,'PaperUnits','centimeters','PaperSize',[50 25]);
 
 %% VE group-level analyses 
 
-% initialize data matrices
-% A/VlocResp_reshaped: stores the localization responses
+% initialize
+% A/VlocResp_reshaped: store the localization responses
 % 5(disc levels) x 5(corr levels) x 6(centroids) x subjectN x #reps(diff for each condition)
 numReps = 40;
-% get trial idx for each condition, each centroid location
+AlocResp_reshaped  = cell(lenD,lenCorr,lenCent,lenN,numReps);  
+VlocResp_reshaped  = cell(lenD,lenCorr,lenCent,lenN,numReps);
+% meanLocA/V_bi store mean of each disc x corr, centroid, for each subject
+meanLocA_bi        = cell(lenD,lenCorr,lenCent,lenN);
+meanLocV_bi        = cell(lenD,lenCorr,lenCent,lenN);
+
+% get trial idx for each disc x corr, each centroid location
 trialidx2 = cell(lenD,lenCorr,lenCent,lenN,numReps);
 for i = 1:lenD
     for j = 1:lenCorr
@@ -229,26 +219,10 @@ for i = 1:lenD
                         & (VE_ujdg_group(:,3) == centroids(m)...
                          | VE_ujdg_group(:,5) == centroids(m)));
                 for k = 1:length(indices)
-                % Store the indices in the cell arrays
                    trialidx2{i,j,m,l,k} = indices(k);
                 end
-            end
-        end
-    end
-end
-
-% grab localization responses for each suject, each condition, each centroid location
-AlocResp_reshaped  = cell(lenD,lenCorr,lenCent,lenN,numReps);  
-VlocResp_reshaped  = cell(lenD,lenCorr,lenCent,lenN,numReps);
-for i = 1:lenD
-    for j = 1:lenCorr
-        for m = 1:lenCent
-            for l = 1:lenN
-                if l == 1 || l == 2
-                    numReps = 40;
-                else
-                    numReps = 32;
-                end
+                % grab localiation responses for A/V and store them into corresponding matrices
+                if l == 1 || l == 2; numReps = 40; else; numReps = 32; end
                 for k = 1:numReps
                     if ~isempty(trialidx2{i,j,m,l,k})
                        if VE_ujdg_group(trialidx2{i,j,m,l,k},8) == 1
@@ -258,42 +232,23 @@ for i = 1:lenD
                        end  
                     end
                 end
-            end
-        end
-    end
-end
-
-% calculate the mean for each subject, each condition, each centroid
-% location
-meanLocA_bi        = cell(lenD,lenCorr,lenCent,lenN);
-meanLocV_bi        = cell(lenD,lenCorr,lenCent,lenN);
-for i = 1:lenD
-    for j = 1:lenCorr
-        for m = 1:lenCent
-            for l = 1:lenN
-                if l == 1 || l == 2
-                    numReps = 40;
-                else
-                    numReps = 32;
-                end
-                % Initialize arrays to hold non-empty values
+                % calculate mean for each disc x corr, centroid
                 nonEmptyA = []; nonEmptyV = [];
                 for k = 1:numReps
-                    if ~isempty(AlocResp_reshaped{i, j, m, l, k})
-                        nonEmptyA = [nonEmptyA; AlocResp_reshaped{i, j, m, l, k}(:)];
+                    if ~isempty(AlocResp_reshaped{i,j,m,l,k})
+                        nonEmptyA = [nonEmptyA; AlocResp_reshaped{i,j,m,l,k}(:)];
                     end
-
-                    if ~isempty(VlocResp_reshaped{i, j, m, l, k})
-                        nonEmptyV = [nonEmptyV; VlocResp_reshaped{i, j, m, l, k}(:)];
+                    if ~isempty(VlocResp_reshaped{i,j,m,l,k})
+                        nonEmptyV = [nonEmptyV; VlocResp_reshaped{i,j,m,l,k}(:)];
                     end
                 end
-                % Calculate means for AlocResp_reshaped and VlocResp_reshaped
-                meanLocA_bi{i, j, m, l} = mean(nonEmptyA, 'omitnan');
-                meanLocV_bi{i, j, m, l} = mean(nonEmptyV, 'omitnan');
+                meanLocA_bi{i,j,m,l} = mean(nonEmptyA);
+                meanLocV_bi{i,j,m,l} = mean(nonEmptyV);
             end
         end
     end
 end
+
 
 % compute group-level VE
 VE_audCentroid_ind = cell(lenD,lenCorr,lenCent,lenN); VE_audCentroid_group = NaN(lenD,lenCorr,lenCent); VE_audAvg = NaN(lenD,lenCorr);
@@ -303,25 +258,28 @@ for i = 1:lenD
         for m = 1:lenCent
             for l = 1:lenN
                 % auditory and visual VE for each disc and corr, at each
-                % centroid location
-                if ~isempty(meanLocA_bi{i,j,m,l}) && ~isempty(meanLocV_bi{i,j,m,l})
-                    VE_audCentroid_ind{i,j,m,l} = meanLocA_bi{i,j,m,l} - meanLocA_uni(l,m);
-                    VE_visCentroid_ind{i,j,m,l} = meanLocV_bi{i,j,m,l} - meanLocV_uni(l,m); 
-                end
+                % centroid location for each subject
+                if ~isempty(meanLocA_bi{i,j,m,l}) 
+                    VE_audCentroid_ind{i,j,m,l} = meanLocA_bi{i,j,m,l} - meanLocA_uni(l,m); end
+                if ~isempty(meanLocV_bi{i,j,m,l})
+                    VE_visCentroid_ind{i,j,m,l} = meanLocV_bi{i,j,m,l} - meanLocV_uni(l,m); end
             end
-            VE_audCentroid_group(i,j,m) = mean(cell2mat(VE_audCentroid_ind(i, j, m, :)), 'omitnan');
-            VE_visCentroid_group(i,j,m) = mean(cell2mat(VE_visCentroid_ind(i, j, m, :)), 'omitnan');
+            % VE for each disc, corr, centroid, averaged across subjects
+            VE_audCentroid_group(i,j,m) = mean(cell2mat(VE_audCentroid_ind(i,j,m,:)), 'omitnan');
+            VE_visCentroid_group(i,j,m) = mean(cell2mat(VE_visCentroid_ind(i,j,m,:)), 'omitnan');
         end
+        % VE for each disc, corr, averaged across 6 centroids
         VE_audAvg(i,j) = mean(VE_audCentroid_group(i,j,:),'omitnan');
         VE_visAvg(i,j) = mean(VE_visCentroid_group(i,j,:),'omitnan');
     end
 end
 
+
 %% plot auditory VE as a function of disc and corr
 x_bds          = [disc_levels(1) - 2, disc_levels(end) + 2]; 
 y_bds          = [min(min(VE_audAvg))-5, max(max(VE_audAvg))+5];
 x_ticks_AVdiff = disc_levels; 
-y_ticks        = -10:5:10; %ceil(min(min(VE_audAvg))-5):5:ceil(max(max(VE_audAvg))+5);
+y_ticks        = -10:5:10; 
 lw             = 2.5; %lineWidth
 fs_lbls        = 20; %font size
 fs_lgds        = 15;
@@ -344,7 +302,7 @@ end
 %add legends 
 legend([fig2(1) fig2(2) fig2(3) fig2(4) fig2(5)], lgd_corr,...
     'FontSize',fs_lgds); legend boxoff;
-xticks(x_ticks_AVdiff); xlim(x_bds); xlabel('Spatial discrepancy (A - V, deg)'); 
+xticks(x_ticks_AVdiff); xlim(x_bds); xlabel('Spatial discrepancy (V - A, deg)'); 
 ylabel(sprintf('Auditory ventriloquism effect')); 
 title('Auditory ventrilquism effect as a function of spatial discrepancy and correlation');
 yticks(y_ticks);ylim(y_bds);
