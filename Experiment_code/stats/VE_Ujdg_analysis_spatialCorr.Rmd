@@ -1,0 +1,131 @@
+---
+title: Effect of spatial correlation on audiovisual integration stats analysis
+author: "Jiaming Xu"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, include = TRUE, fig.width = 4, fig.height = 4, fig.align = "center")
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+```{r libs,include=FALSE}
+rm(list = ls())
+library(lme4)
+library(car)
+library(lmerTest)
+library(readxl)
+library(effects)
+library(ggplot2)
+library(emmeans)
+library(dplyr)
+library(knitr)
+library(foreign)
+```
+
+**Unity judgment** 
+```{r, include=TRUE}
+# Data cleaning
+rm(list = ls())
+setwd("/Users/oliviaxujiaming/Desktop/Github/SpatialCorrelation/Experiment_code/stats")
+VE_ujdg_data = read_excel('VE_ujdg_trialByTrial_allSubj.xlsx')
+VE_ujdg_data["ujdg"][VE_ujdg_data["ujdg"]==2] <- 0
+```
+GLMM as ordered factors
+```{r, include=FALSE}
+#unity_indvd_data$SpatialD_abs<-factor(unity_indvd_data$SpatialD_abs, ordered=TRUE) 
+#unity_indvd_data$TemporalD<-factor(unity_indvd_data$TemporalD, ordered=TRUE)
+
+#GLMMmodel_AV <- glmer(Ujdg ~ SpatialD_abs * TemporalD + (1|Subject), 
+#                      data = unity_indvd_data, family='binomial', 
+#                      control = glmerControl(optimizer='bobyqa'))
+#summary(GLMMmodel_AV)
+#Anova(GLMMmodel_AV)
+#confint(GLMMmodel_AV)
+```
+GLMM as numeric factors
+```{r, include=TRUE}
+class(VE_ujdg_data$disc) = "Numeric"
+class(VE_ujdg_data$corr) = "Numeric"
+
+GLMMmodel_AV1 <- glmer(ujdg ~ (scale(disc)+scale(disc^2))*
+                         (scale(corr)+scale(corr^2)) + (1|subjID), 
+                      data = VE_ujdg_data, family='binomial', 
+                      control = glmerControl(optimizer='bobyqa'))
+
+summary(GLMMmodel_AV1, corr = FALSE)
+Anova(GLMMmodel_AV1)
+confint(GLMMmodel_AV1)
+```
+
+**Auditory ventriloquism effect**
+```{r, include=TRUE}
+# Data cleaning
+audVE_indvd_data <- VE_ujdg_data[, - c(6, 8)]
+audVE_indvd_data <- audVE_indvd_data[complete.cases(audVE_indvd_data), ]
+audVE_indvd_zeroDisc <- audVE_indvd_data[audVE_indvd_data$disc==0, ]
+```
+LMM as ordered factors
+```{r, include=TRUE}
+audVE_indvd_data$disc<-factor(audVE_indvd_data$disc, ordered=TRUE) 
+audVE_indvd_data$corr<-factor(audVE_indvd_data$corr, ordered=TRUE)
+audVE_indvd_data$subjID<-factor(audVE_indvd_data$subjID, ordered=TRUE)
+lmer_resultsAV <-lmer(audVE~ disc * corr + (1|subjID), 
+                       data=audVE_indvd_data)
+summary(lmer_resultsAV)
+Anova(lmer_resultsAV)
+confint(lmer_resultsAV)
+```
+LMM as numeric factors
+```{r, include=TRUE}
+class(audVE_indvd_data$disc) = "Numeric"
+class(audVE_indvd_data$corr) = "Numeric"
+class(audVE_indvd_data$subjID) = "Numeric"
+lmer_resultsAV1 <- lmer(audVE ~ (scale(disc)+scale(disc^2))*
+                          (scale(corr)+scale(corr^2)) + 
+                          (1|subjID), data = audVE_indvd_data)
+summary(lmer_resultsAV1,corr = FALSE)
+Anova(lmer_resultsAV1)
+confint(lmer_resultsAV1)
+```
+At 0 discrepancy
+```{r, include=TRUE}
+lmer_resultsAV2 <- lmer(audVE ~ (scale(corr)+scale(corr^2)) + 
+                          (1|subjID), data = audVE_indvd_zeroDisc)
+summary(lmer_resultsAV2,corr = FALSE)
+Anova(lmer_resultsAV2)
+confint(lmer_resultsAV2)
+```
+
+**Visual ventriloquism effect**
+```{r, include=TRUE}
+# Data cleaning
+visVE_indvd_data <- VE_ujdg_data[, - c(6, 7)]
+visVE_indvd_data <- visVE_indvd_data[complete.cases(visVE_indvd_data), ]
+```
+LMM as ordered factors
+```{r, include=FALSE}
+visVE_indvd_data$disc<-factor(visVE_indvd_data$disc, ordered=TRUE) 
+visVE_indvd_data$corr<-factor(visVE_indvd_data$corr, ordered=TRUE)
+visVE_indvd_data$subjID<-factor(visVE_indvd_data$subjID, ordered=TRUE)
+lmer_resultsAV3 <-lmer(visVE~ disc * corr + (1|subjID), 
+                       data=visVE_indvd_data)
+summary(lmer_resultsAV3)
+Anova(lmer_resultsAV3)
+confint(lmer_resultsAV3)
+```
+LMM as numeric factors
+```{r, include=TRUE}
+class(visVE_indvd_data$disc) = "Numeric"
+class(visVE_indvd_data$corr) = "Numeric"
+class(visVE_indvd_data$subjID) = "Numeric"
+lmer_resultsAV4 <- lmer(visVE ~ (scale(disc)+scale(disc^2))*
+                          (scale(corr)+scale(corr^2)) + 
+                          (1|subjID), data = visVE_indvd_data)
+summary(lmer_resultsAV4,corr = FALSE)
+Anova(lmer_resultsAV4)
+confint(lmer_resultsAV4)
+```
